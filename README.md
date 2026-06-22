@@ -45,6 +45,43 @@ El núcleo del sistema integra las estructuras individuales en 4 flujos lógicos
 
 ---
 
+---
+
+## Estructura del Proyecto
+```text
+ten-floors-mmorpg/
+├── .gitignore
+├── README.md
+├── assets/                          # Capturas de pantalla, diagramas UML y PDFs de la cátedra
+│   ├── diagramas/
+│   └── documentos/
+├── src/
+│   ├── main/
+│   │   └── java/
+│   │       └── com/
+│   │           └── tenfloors/
+│   │               ├── Main.java    # Menú interactivo principal (Scanner / Switch-case)
+│   │               ├── model/       # Clases de negocio
+│   │               └── tda/         # Estructuras de datos (TDAs individuales)
+│   │                   ├── abb/
+│   │                   ├── arbol/
+│   │                   ├── arbolB/
+│   │                   ├── avl/
+│   │                   ├── cola/
+│   │                   ├── colaPrioridad/
+│   │                   ├── diccionario/
+│   │                   ├── grafo/
+│   │                   └── pila/
+│   └── test/                           # Panel de testeo aislado para cada integrante
+│       └── java/
+│           └── com/
+│               └── tenfloors/
+│                   └── tda/
+│                       └── Testcola.java # Por ejemplo
+```
+
+---
+
 ## Reglas de Branching (Git)
 
 Para mantener el repositorio limpio y evitar conflictos durante los merges, cada miembro trabajará estrictamente en su propia rama de desarrollo:
