@@ -1,0 +1,21 @@
+# Objetos de compilación y salidas
+**/bin/
+**/out/
+**/target/
+.gradle/
+build/
+
+# Archivos de configuración de IDEs
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+
+# Archivos del Sistema Operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de logs temporales
+*.log
