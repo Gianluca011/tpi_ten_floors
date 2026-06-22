@@ -77,7 +77,7 @@ ten-floors-mmorpg/
 │           └── com/
 │               └── tenfloors/
 │                   └── tda/
-│                       └── Testcola.java # Por ejemplo
+│                       └── TestCola.java # Por ejemplo
 ```
 
 ---
