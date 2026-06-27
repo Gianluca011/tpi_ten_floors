@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
 
 public class ArbolGenericoTest {
 
-    private ArbolGenerico<ClaseHabilidad> arbolProgrecion;
+    private ArbolGenerico<ClaseHabilidad> arbolProgresion;
     private ClaseHabilidad swordsman;
     private ClaseHabilidad activas;
     private ClaseHabilidad pasivas;
@@ -18,7 +18,7 @@ public class ArbolGenericoTest {
 
     @BeforeEach
     public void setUp() {
-        arbolProgrecion = new ArbolGenerico<>();
+        arbolProgresion = new ArbolGenerico<>();
         swordsman = new ClaseHabilidad("Swordsman", "CLASE", 1);
         activas = new ClaseHabilidad("Habilidades Activas", "CATEGORIA", 1);
         pasivas = new ClaseHabilidad("Habilidades Pasivas", "CATEGORIA", 1);
@@ -27,51 +27,51 @@ public class ArbolGenericoTest {
 
     @Test
     public void testAgregarRaizCuandoArbolEstaVacio() {
-        arbolProgrecion.agregarHijo(null, swordsman);
-        assertFalse(arbolProgrecion.estaVacio());
-        assertEquals(swordsman, arbolProgrecion.getRaiz().getDato());
+        arbolProgresion.agregarHijo(null, swordsman);
+        assertFalse(arbolProgresion.estaVacio());
+        assertEquals(swordsman, arbolProgresion.getRaiz().getDato());
     }
 
     @Test
     public void testAgregarHijosMultiplesYVerificarJerarquia() {
-        arbolProgrecion.agregarHijo(null, swordsman);
-        arbolProgrecion.agregarHijo(swordsman, activas);
-        arbolProgrecion.agregarHijo(swordsman, pasivas);
-        arbolProgrecion.agregarHijo(activas, corteVertical);
+        arbolProgresion.agregarHijo(null, swordsman);
+        arbolProgresion.agregarHijo(swordsman, activas);
+        arbolProgresion.agregarHijo(swordsman, pasivas);
+        arbolProgresion.agregarHijo(activas, corteVertical);
 
         // La raíz debe seguir siendo Swordsman
-        assertEquals(swordsman, arbolProgrecion.getRaiz().getDato());
+        assertEquals(swordsman, arbolProgresion.getRaiz().getDato());
 
         // El primer hijo de la raíz debe ser la categoría de activas
-        assertEquals(activas, arbolProgrecion.getRaiz().getPrimerHijo().getDato());
+        assertEquals(activas, arbolProgresion.getRaiz().getPrimerHijo().getDato());
 
         // El hermano del primer hijo debe ser la categoría de pasivas (LCRS)
-        assertEquals(pasivas, arbolProgrecion.getRaiz().getPrimerHijo().getSiguienteHermano().getDato());
+        assertEquals(pasivas, arbolProgresion.getRaiz().getPrimerHijo().getSiguienteHermano().getDato());
     }
 
     @Test
     public void testAgregarHijoAPadreInexistenteLanzaExcepcion() {
-        arbolProgrecion.agregarHijo(null, swordsman);
+        arbolProgresion.agregarHijo(null, swordsman);
         ClaseHabilidad magoInexistente = new ClaseHabilidad("Mage", "CLASE", 1);
 
         assertThrows(NoSuchElementException.class, () -> {
-            arbolProgrecion.agregarHijo(magoInexistente, activas);
+            arbolProgresion.agregarHijo(magoInexistente, activas);
         });
     }
 
     @Test
     public void testAgregarHijoNuloLanzaExcepcion() {
-        arbolProgrecion.agregarHijo(null, swordsman);
+        arbolProgresion.agregarHijo(null, swordsman);
 
         assertThrows(IllegalArgumentException.class, () -> {
-            arbolProgrecion.agregarHijo(swordsman, null);
+            arbolProgresion.agregarHijo(swordsman, null);
         });
     }
 
     @Test
     public void testAgregarRaizConPadreNoNuloLanzaExcepcion() {
         assertThrows(IllegalStateException.class, () -> {
-            arbolProgrecion.agregarHijo(activas, swordsman);
+            arbolProgresion.agregarHijo(activas, swordsman);
         });
     }
 }
