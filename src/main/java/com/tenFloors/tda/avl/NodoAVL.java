@@ -1,17 +1,21 @@
 package main.java.com.tenFloors.tda.avl;
 
-public class NodoAVL<T extends IIdentificable> {
+public class NodoAVL<T> {
+    private String id;
     private T dato;
     private int altura;
     private NodoAVL<T> izquierdo;
     private NodoAVL<T> derecho;
 
-    public NodoAVL(T dato) {
+    public NodoAVL(String id, T dato) {
+        this.id = id;
         this.dato = dato;
         this.altura = 1;
     }
 
     // Getters y Setters
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
     public T getDato() { return dato; }
     public void setDato(T dato) { this.dato = dato; }
     public int getAltura() { return altura; }

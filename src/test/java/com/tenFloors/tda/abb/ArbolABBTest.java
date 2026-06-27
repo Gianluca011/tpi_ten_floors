@@ -11,9 +11,9 @@ public class ArbolABBTest {
 
     private ArbolABB<Item> mochila;
 
-    // Clase concreta interna para testeo rápido sin depender de subclases de Item
+    // Clase concreta interna adaptada al constructor con String ID
     private static class ItemPrueba extends Item {
-        public ItemPrueba(int id, String nombre, String rareza) { super(id, nombre, rareza); }
+        public ItemPrueba(String id, String nombre, String rareza) { super(id, nombre, rareza); }
         @Override public void usar() {}
     }
 
@@ -24,31 +24,38 @@ public class ArbolABBTest {
 
     @Test
     public void testInsercionYOrdenamientoInorden() {
-        // Insertamos ítems en orden aleatorio
-        mochila.insertar(new ItemPrueba(50, "Espada", "Comun"));
-        mochila.insertar(new ItemPrueba(20, "Pocion", "Comun"));
-        mochila.insertar(new ItemPrueba(80, "Escudo", "Raro"));
+        Item espada = new ItemPrueba("50", "Espada", "Comun");
+        Item pocion = new ItemPrueba("20", "Pocion", "Comun");
+        Item escudo = new ItemPrueba("80", "Escudo", "Raro");
+
+        // Insertamos pasando (ID, Objeto) de forma explícita
+        mochila.insertar(espada.getId(), espada);
+        mochila.insertar(pocion.getId(), pocion);
+        mochila.insertar(escudo.getId(), escudo);
 
         List<Item> resultado = mochila.obtenerInorden();
 
-        // Verificamos que el recorrido Inorden los ordene por ID
+        // Verificamos que el recorrido Inorden los ordene alfabéticamente por ID
         assertEquals(3, resultado.size());
-        assertEquals(20, resultado.get(0).getId());
-        assertEquals(50, resultado.get(1).getId());
-        assertEquals(80, resultado.get(2).getId());
+        assertEquals("20", resultado.get(0).getId());
+        assertEquals("50", resultado.get(1).getId());
+        assertEquals("80", resultado.get(2).getId());
     }
 
     @Test
     public void testBusquedaYEliminacion() {
-        mochila.insertar(new ItemPrueba(10, "Item10", "C"));
-        mochila.insertar(new ItemPrueba(5, "Item5", "C"));
+        Item item1 = new ItemPrueba("10", "Item10", "C");
+        Item item2 = new ItemPrueba("05", "Item5", "C");
 
-        // Buscamos un nodo existente
-        assertNotNull(mochila.buscar(10));
+        mochila.insertar(item1.getId(), item1);
+        mochila.insertar(item2.getId(), item2);
 
-        // Eliminamos un nodo (Caso 1 o 2)
-        mochila.eliminar(5);
-        assertNull(mochila.buscar(5), "El ítem con ID 5 debería haber sido eliminado.");
-        assertNotNull(mochila.buscar(10), "El ítem con ID 10 debería seguir existiendo.");
+        // Buscamos usando String ID
+        assertNotNull(mochila.buscar("10"));
+
+        // Eliminamos usando String ID
+        mochila.eliminar("05");
+        assertNull(mochila.buscar("05"), "El ítem con ID '05' debería haber sido eliminado.");
+        assertNotNull(mochila.buscar("10"), "El ítem con ID '10' debería seguir existiendo.");
     }
 }
