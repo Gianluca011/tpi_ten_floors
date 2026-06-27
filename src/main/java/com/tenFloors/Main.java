@@ -1,6 +1,11 @@
 package main.java.com.tenFloors;
 
+import main.java.com.tenFloors.model.*;
 import main.java.com.tenFloors.tda.pila.Pila;
+import main.java.com.tenFloors.tda.avl.ArbolAVLCuentas;
+import main.java.com.tenFloors.tda.abb.ArbolABB;
+
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -9,7 +14,18 @@ public class Main {
     private static final Pila<String> historialMenus = new Pila<>();
     private static boolean running = true;
 
+    // Almacenamiento síncrono e Índices globales para la ejecución del ecosistema
+    private static final ArbolAVLCuentas<Cuenta> indiceCuentas = new ArbolAVLCuentas<>();
+    private static final ArbolABB<Item> baseGlobalItems = new ArbolABB<>();
+    private static SistemaComercioSeguro sistemaComercio;
+
     public static void main(String[] args) {
+        // Inicializamos el motor del hito técnico cruzando los índices requeridos
+        sistemaComercio = new SistemaComercioSeguro(indiceCuentas, baseGlobalItems);
+
+        // Pre-carga de datos reales para posibilitar pruebas inmediatas sin placeholders
+        inicializarDatosDemo();
+
         System.out.println("==================================================");
         System.out.println("             BIENVENIDOS A TEN FLOORS             ");
         System.out.println("==================================================");
@@ -17,7 +33,7 @@ public class Main {
         // Iniciamos el historial con el estado principal
         historialMenus.apilar("PRINCIPAL");
 
-        // Bucle principal
+        // Bucle principal de ejecución de consola
         while (running && !historialMenus.estaVacia()) {
             String menuActual = historialMenus.verTope();
 
@@ -34,6 +50,32 @@ public class Main {
 
         System.out.println("\n[SISTEMA] Servidor cerrado correctamente.");
         scanner.close();
+    }
+
+    /**
+     * Carga de datos mock controlados para validar el comportamiento del Hito 4 de forma autónoma.
+     */
+    private static void inicializarDatosDemo() {
+        // 1. Poblamos el catálogo del servidor (ABB) con ítems íntegros
+        baseGlobalItems.insertar("ITM-701", new ItemJuego("ITM-701", "Espada del Inframundo", "Legendaria"));
+        baseGlobalItems.insertar("ITM-702", new ItemJuego("ITM-702", "Poción de Vida Mayor", "Común"));
+        baseGlobalItems.insertar("ITM-703", new ItemJuego("ITM-703", "Escudo del Olimpo", "Épica"));
+
+        // 2. Registramos una cuenta de prueba para Lautaro Salto (ID: ACC-77)
+        Jugador lauti = new Jugador("ACC-77", "Lauti_Salto");
+        lauti.setNivel(60);
+        lauti.setPisoActual(10);
+        Cuenta cuentaLauti = new Cuenta(lauti);
+
+        // Simulamos que Lauti vendió la Espada y la Poción (Se apilan en su historial comercial)
+        long tiempoActual = System.currentTimeMillis();
+        cuentaLauti.getHistorialComercio().apilar(new Transaccion(5001L, "ITM-701", 9999.0, tiempoActual - 100000));
+        cuentaLauti.getHistorialComercio().apilar(new Transaccion(5002L, "ITM-702", 150.0, tiempoActual - 20000));
+
+        cuentaLauti.getInventario().insertar("ITM-703", baseGlobalItems.buscar("ITM-703"));
+
+        // 3. Insertamos la cuenta en el índice AVL global
+        indiceCuentas.insertar(cuentaLauti.getJugador().getIdCuenta(), cuentaLauti);
     }
 
     // --- MENÚ PRINCIPAL ---
@@ -59,78 +101,121 @@ public class Main {
         System.out.println("1. Dar de Alta Cuenta (Árbol AVL Global)");
         System.out.println("2. Dar de Baja Cuenta (Árbol AVL Global)");
         System.out.println("3. Agregar Ítem a Mochila de Jugador (ABB)");
-        System.out.println("4. Eliminar Ítem de Mochila de Jugador (ABB)");
-        System.out.println("5. Ver Historial de Subastas (Árbol B)");
-        System.out.println("6. <- Volver al Menú Principal");
-        System.out.print("Seleccione una opción: ");
-
-        int opcion = leerOpcion();
-        switch (opcion) {
-            case 1 -> {
-                // TODO: Axel Mendoza - Lógica de inserción y balanceo en Árbol AVL
-                System.out.println("[PLACEHOLDER] Ejecutando alta de cuenta en AVL...");
-            }
-            case 2 -> {
-                // TODO: Axel Mendoza - Lógica de eliminación y balanceo en Árbol AVL
-                System.out.println("[PLACEHOLDER] Ejecutando baja de cuenta en AVL...");
-            }
-            case 3 -> {
-                // TODO: Axel Mendoza - Lógica de inserción en ABB (Inventario)
-                System.out.println("[PLACEHOLDER] Insertando ítem en el ABB del jugador...");
-            }
-            case 4 -> {
-                // TODO: Axel Mendoza - Lógica de eliminación en ABB (Inventario)
-                System.out.println("[PLACEHOLDER] Eliminando ítem del ABB del jugador...");
-            }
-            case 5 -> {
-                // TODO: Axel Mendoza - Lógica de búsqueda/recorrido en Árbol B
-                System.out.println("[PLACEHOLDER] Mostrando historial de transacciones del Árbol B...");
-            }
-            case 6 -> historialMenus.desapilar();
-            default -> System.out.println("[ERROR] Opcion invalida. Intente nuevamente.");
-        }
-    }
-
-    // --- SUBMENÚ 2: CONSULTAS COMPLEJAS ---
-    private static void showConsultasComplejasMenu() {
-        System.out.println("\n--- CONSULTAS COMPLEJAS (HITOS GRUPALES) ---");
-        System.out.println("1. Hito 1: Viaje Rápido y Formación de Party");
-        System.out.println("2. Hito 2: Soporte Técnico VIP");
-        System.out.println("3. Hito 3: Auditoría de Gremios");
-        System.out.println("4. Hito 4: Sistema de Comercio Seguro");
+        System.out.println("4. Ver Estado e Inspección de Cuenta (AVL + ABB + Pila)");
         System.out.println("5. <- Volver al Menú Principal");
         System.out.print("Seleccione una opción: ");
 
         int opcion = leerOpcion();
         switch (opcion) {
             case 1 -> {
-                // TODO: Integración Hito 1 (Grafo BFS + Diccionario Online + Cola Estándar)
-                System.out.println("[PLACEHOLDER] Ejecutando Hito 1...");
+                System.out.print("Ingrese el ID único de cuenta (ej. ACC-12): ");
+                String id = scanner.nextLine().trim();
+                System.out.print("Ingrese el nombre del personaje: ");
+                String nombre = scanner.nextLine().trim();
+                if (!id.isEmpty() && !nombre.isEmpty()) {
+                    Cuenta nuevaCuenta = new Cuenta(new Jugador(id, nombre));
+                    indiceCuentas.insertar(id, nuevaCuenta);
+                    System.out.println("[AVL] Cuenta registrada e índice rebalanceado exitosamente.");
+                } else {
+                    System.out.println("[ERROR] Entradas vacías no permitidas.");
+                }
             }
             case 2 -> {
-                // TODO: Integración Hito 2 (Cola Prioridad Heap + Árbol B + ABB)
-                System.out.println("[PLACEHOLDER] Ejecutando Hito 2...");
+                System.out.print("Ingrese el ID de la cuenta a dar de baja: ");
+                String id = scanner.nextLine().trim();
+                if (indiceCuentas.buscar(id) != null) {
+                    indiceCuentas.eliminar(id);
+                    System.out.println("[AVL] Cuenta removida correctamente. Árbol auto-balanceado.");
+                } else {
+                    System.out.println("[ERROR] La cuenta especificada no existe.");
+                }
             }
             case 3 -> {
-                // TODO: Integración Hito 3 (Árbol N-ario + AVL + Diccionario Conjunto)
-                System.out.println("[PLACEHOLDER] Ejecutando Hito 3...");
+                System.out.print("Ingrese el ID de cuenta del jugador: ");
+                String idC = scanner.nextLine().trim();
+                Cuenta c = indiceCuentas.buscar(idC);
+                if (c != null) {
+                    System.out.print("Ingrese ID de ítem del catálogo (ITM-701, ITM-702, ITM-703): ");
+                    String idI = scanner.nextLine().trim();
+                    Item it = baseGlobalItems.buscar(idI);
+                    if (it != null) {
+                        c.getInventario().insertar(idI, it);
+                        System.out.println("[ABB] Ítem indexado en el inventario del jugador.");
+                    } else {
+                        System.out.println("[ERROR] Ítem inexistente en el catálogo global ABB.");
+                    }
+                } else {
+                    System.out.println("[ERROR] Cuenta no encontrada.");
+                }
             }
             case 4 -> {
-                // TODO: Integración Hito 4 (Pila Historial + ABB + AVL)
-                System.out.println("[PLACEHOLDER] Ejecutando Hito 4...");
+                System.out.print("Ingrese ID de cuenta a inspeccionar (Pruebe con 'ACC-77'): ");
+                String id = scanner.nextLine().trim();
+                Cuenta c = indiceCuentas.buscar(id);
+                if (c != null) {
+                    System.out.println("\n==================================================");
+                    System.out.println("AUDITORÍA DE CUENTA AVL: " + c.getJugador().getIdCuenta());
+                    System.out.println("==================================================");
+                    System.out.println("Personaje: " + c.getJugador().getNombre() + " | Nivel: " + c.getJugador().getNivel());
+                    System.out.println("Ubicación Actual: Piso " + c.getJugador().getPisoActual());
+
+                    System.out.println("\n-> Mochila del Jugador (Recorrido Inorden ABB):");
+                    List<Item> items = c.getInventario().obtenerInorden();
+                    if (items.isEmpty()) {
+                        System.out.println("   [La mochila está vacía]");
+                    } else {
+                        for (Item item : items) {
+                            System.out.println("   * " + item.toString());
+                        }
+                    }
+                    System.out.println("\n-> Operaciones comerciales pendientes en Pila (Tamanio): " + c.getHistorialComercio().getTamanio());
+                    System.out.println("==================================================");
+                } else {
+                    System.out.println("[ERROR] No se encontró ninguna cuenta asociada a ese ID.");
+                }
             }
             case 5 -> historialMenus.desapilar();
             default -> System.out.println("[ERROR] Opción inválida. Intente nuevamente.");
         }
     }
 
-    // --- METODO DE CONTROL Y VALIDACIÓN DE ENTRADA ---
+    // --- MENÚ 2: CONSULTAS COMPLEJAS ---
+    private static void showConsultasComplejasMenu() {
+        System.out.println("\n--- CONSULTAS COMPLEJAS (HITOS GRUPALES) ---");
+        System.out.println("1. Hito 1: Viaje Rápido y Formación de Party [Deshabilitado]");
+        System.out.println("2. Hito 2: Soporte Técnico VIP [Deshabilitado]");
+        System.out.println("3. Hito 3: Auditoría de Gremios [Deshabilitado]");
+        System.out.println("4. Hito 4: Sistema de Comercio Seguro (Ejecutar Rollback)");
+        System.out.println("5. <- Volver al Menú Principal");
+        System.out.print("Seleccione una opción: ");
+
+        int opcion = leerOpcion();
+        switch (opcion) {
+            case 1, 2, 3 -> System.out.println("[INFO] Utilice la opción 4 para validar Comercio Seguro.");
+            case 4 -> {
+                System.out.println("\n--- EJECUCIÓN: HITO 4 (SISTEMA DE COMERCIO SEGURO) ---");
+                System.out.print("Ingrese el ID de la cuenta para revertir su última transacción (ej: ACC-77): ");
+                String idBuscado = scanner.nextLine().trim();
+
+                boolean exito = sistemaComercio.revertirUltimaTransaccion(idBuscado);
+                if (exito) {
+                    System.out.println("[SISTEMA] Flujo completado de forma segura y exitosa.");
+                } else {
+                    System.out.println("[SISTEMA] Protocolo Comercio Seguro abortado / Falla de condiciones.");
+                }
+            }
+            case 5 -> historialMenus.desapilar();
+            default -> System.out.println("[ERROR] Opción inválida. Intente nuevamente.");
+        }
+    }
+
+    // --- METODO DE VALIDACIÓN DE ENTRADA ---
     private static int leerOpcion() {
         try {
             String input = scanner.nextLine();
             return Integer.parseInt(input.trim());
         } catch (NumberFormatException e) {
-            return -1; // Captura errores de entrada (letras, vacíos) sin romper la ejecución
+            return -1;
         }
     }
 }
