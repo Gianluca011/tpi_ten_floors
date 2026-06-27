@@ -1,6 +1,8 @@
 package main.java.com.tenFloors;
 
 import main.java.com.tenFloors.model.*;
+import main.java.com.tenFloors.tda.arbol.ArbolGenerico;
+import main.java.com.tenFloors.tda.conjunto.Conjunto;
 import main.java.com.tenFloors.tda.pila.Pila;
 import main.java.com.tenFloors.tda.avl.ArbolAVLCuentas;
 import main.java.com.tenFloors.tda.abb.ArbolABB;
@@ -18,6 +20,8 @@ public class Main {
     private static final ArbolAVLCuentas<Cuenta> indiceCuentas = new ArbolAVLCuentas<>();
     private static final ArbolABB<Item> baseGlobalItems = new ArbolABB<>();
     private static SistemaComercioSeguro sistemaComercio;
+    private static final SistemaAuditoriaGremios sistemaAuditoria = new SistemaAuditoriaGremios();
+    private static Gremio gremioDemo; // Definido de forma global para persistir en memoria síncrona
 
     public static void main(String[] args) {
         // Inicializamos el motor del hito técnico cruzando los índices requeridos
@@ -56,6 +60,10 @@ public class Main {
      * Carga de datos mock controlados para validar el comportamiento del Hito 4 de forma autónoma.
      */
     private static void inicializarDatosDemo() {
+
+        /*
+        * Para Hito 4
+        * */
         // 1. Poblamos el catálogo del servidor (ABB) con ítems íntegros
         baseGlobalItems.insertar("ITM-701", new ItemJuego("ITM-701", "Espada del Inframundo", "Legendaria"));
         baseGlobalItems.insertar("ITM-702", new ItemJuego("ITM-702", "Poción de Vida Mayor", "Común"));
@@ -76,6 +84,33 @@ public class Main {
 
         // 3. Insertamos la cuenta en el índice AVL global
         indiceCuentas.insertar(cuentaLauti.getJugador().getIdCuenta(), cuentaLauti);
+
+        /*
+        * Para Hito 3
+        * */
+        gremioDemo = new Gremio("Los Conquistadores de Aincrad", "LCA");
+
+        // Registramos cuentas de oficiales adicionales en el AVL global de Axel
+        Cuenta cuentaGian = new Cuenta(new Jugador("ACC-02", "Gian_Chia"));
+        cuentaGian.getJugador().setNivel(55);
+        Cuenta cuentaAxel = new Cuenta(new Jugador("ACC-03", "Axel_Menz"));
+        cuentaAxel.getJugador().setNivel(58);
+
+        indiceCuentas.insertar("ACC-02", cuentaGian);
+        indiceCuentas.insertar("ACC-03", cuentaAxel);
+
+        // Accedemos al árbol interno del gremio para establecer los rangos
+        ArbolGenerico<String> tree = gremioDemo.getEstructuraJerarquica();
+
+        // El Guild Master en la raíz (Padre null) es Lauti
+        tree.agregarHijo(null, "ACC-77");
+
+        // Gian y Axel son Oficiales directos de Lauti
+        tree.agregarHijo("ACC-77", "ACC-02");
+        tree.agregarHijo("ACC-77", "ACC-03");
+
+        // Forzamos la falla de auditoría metiendo una cuenta inexistente en el AVL
+        tree.agregarHijo("ACC-03", "ACC-FANTASMA");
     }
 
     // --- MENÚ PRINCIPAL ---
@@ -191,7 +226,27 @@ public class Main {
 
         int opcion = leerOpcion();
         switch (opcion) {
-            case 1, 2, 3 -> System.out.println("[INFO] Utilice la opción 4 para validar Comercio Seguro.");
+            case 1, 2 -> System.out.println("[INFO] Utilice la opción 4 para validar Comercio Seguro.");
+            case 3 -> {
+                System.out.println("\n--- EJECUCIÓN: HITO 3 (AUDITORÍA DE GREMIOS) ---");
+                System.out.println("Datos Generales del " + gremioDemo.toString());
+                System.out.println("Visualización estructural por Consola (Preorden del TDA):");
+
+                // Invocamos el preorden nativo de Gianluca para pintar las sangrías en consola
+                gremioDemo.getEstructuraJerarquica().preorden();
+
+                // Disparamos el motor cruzado de los 3 TDAs pasando el objeto Gremio
+                Conjunto<Jugador> lideresAudita = sistemaAuditoria.auditarLideresGremio(gremioDemo, indiceCuentas);
+
+                System.out.println("\n==================================================");
+                System.out.println("RESULTADO DE CONSOLIDACIÓN EN CONJUNTO TEMPORAL");
+                System.out.println("==================================================");
+                System.out.println("Total de líderes únicos validados y almacenados: " + lideresAudita.getTamanio());
+                System.out.println("Verificación de Existencia de Claves:");
+                System.out.println("   ¿Se consolidó al GM (ACC-77)?: " + lideresAudita.contiene(new Jugador("ACC-77", "")));
+                System.out.println("   ¿Se consolidó al ID FANTASMA?: " + lideresAudita.contiene(new Jugador("ACC-FANTASMA", "")));
+                System.out.println("==================================================");
+            }
             case 4 -> {
                 System.out.println("\n--- EJECUCIÓN: HITO 4 (SISTEMA DE COMERCIO SEGURO) ---");
                 System.out.print("Ingrese el ID de la cuenta para revertir su última transacción (ej: ACC-77): ");
