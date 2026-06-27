@@ -21,20 +21,20 @@ public class GestorCuentas {
             throw new IllegalArgumentException("El jugador no puede ser nulo.");
         }
 
-        // Regla de Negocio: No puede haber dos cuentas con el mismo ID.
-        // Hacemos una búsqueda previa O(log n) para asegurarnos.
-        if (indiceGlobalCuentas.buscar(jugador.getId()) != null) {
-            System.out.println("[AVL] Error: El ID " + jugador.getId() + " ya está registrado.");
+        // Regla de Negocio: No puede haber dos cuentas con el mismo ID (ahora String).
+        // Asumiendo que jugador.getIdCuenta() ahora devuelve un String.
+        if (indiceGlobalCuentas.buscar(jugador.getIdCuenta()) != null) {
+            System.out.println("[AVL] Error: El ID " + jugador.getIdCuenta() + " ya está registrado.");
             return;
         }
 
-        // Si pasa las validaciones, lo insertamos (el AVL se balanceará solo si es necesario)
-        indiceGlobalCuentas.insertar(jugador);
+        // Se envía de forma explícita la clave String y el objeto jugador
+        indiceGlobalCuentas.insertar(jugador.getIdCuenta(), jugador);
         System.out.println("[AVL] Cuenta '" + jugador.getNombre() + "' dada de alta.");
     }
 
     // --- BAJA DE CUENTAS ---
-    public void darDeBajaCuenta(int idCuenta) {
+    public void darDeBajaCuenta(String idCuenta) {
         // Buscamos para ver si el ID ingresado realmente existe
         Jugador jugador = indiceGlobalCuentas.buscar(idCuenta);
         if (jugador == null) {
@@ -42,13 +42,13 @@ public class GestorCuentas {
             return;
         }
 
-        // Ejecutamos la eliminación. El TDA se encarga de reestructurar y recalcular las alturas.
+        // Ejecutamos la eliminación por String ID.
         indiceGlobalCuentas.eliminar(idCuenta);
         System.out.println("[AVL] Cuenta de " + jugador.getNombre() + " eliminada.");
     }
 
     // --- BÚSQUEDA ---
-    public Jugador obtenerCuenta(int idCuenta) {
+    public Jugador obtenerCuenta(String idCuenta) {
         return indiceGlobalCuentas.buscar(idCuenta);
     }
 }

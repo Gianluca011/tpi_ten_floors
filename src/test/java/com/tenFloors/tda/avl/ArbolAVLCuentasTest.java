@@ -1,7 +1,6 @@
 package test.java.com.tenFloors.tda.avl;
 
 import main.java.com.tenFloors.tda.avl.ArbolAVLCuentas;
-import main.java.com.tenFloors.tda.avl.IIdentificable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -10,11 +9,11 @@ public class ArbolAVLCuentasTest {
 
     private ArbolAVLCuentas<CuentaMock> arbol;
 
-    // Clase interna para probar el AVL sin depender de la clase Jugador real
-    private static class CuentaMock implements IIdentificable {
-        private final int id;
-        public CuentaMock(int id) { this.id = id; }
-        @Override public int getId() { return id; }
+    // Clase interna limpia: ya no implementa IIdentificable y usa String ID
+    private static class CuentaMock {
+        private final String id;
+        public CuentaMock(String id) { this.id = id; }
+        public String getId() { return id; }
     }
 
     @BeforeEach
@@ -24,36 +23,45 @@ public class ArbolAVLCuentasTest {
 
     @Test
     public void testInsercionYBusqueda() {
-        arbol.insertar(new CuentaMock(10));
-        arbol.insertar(new CuentaMock(20));
-        arbol.insertar(new CuentaMock(5));
+        CuentaMock c1 = new CuentaMock("10");
+        CuentaMock c2 = new CuentaMock("20");
+        CuentaMock c3 = new CuentaMock("05");
 
-        assertNotNull(arbol.buscar(10));
-        assertNotNull(arbol.buscar(20));
-        assertNotNull(arbol.buscar(5));
-        assertNull(arbol.buscar(99), "La búsqueda de un ID inexistente debería devolver null.");
+        arbol.insertar(c1.getId(), c1);
+        arbol.insertar(c2.getId(), c2);
+        arbol.insertar(c3.getId(), c3);
+
+        assertNotNull(arbol.buscar("10"));
+        assertNotNull(arbol.buscar("20"));
+        assertNotNull(arbol.buscar("05"));
+        assertNull(arbol.buscar("99"), "La búsqueda de un ID inexistente debería devolver null.");
     }
 
     @Test
     public void testAutoBalanceo() {
-        // Insertamos datos en orden ascendente para forzar el desbalanceo
-        arbol.insertar(new CuentaMock(1));
-        arbol.insertar(new CuentaMock(2));
-        arbol.insertar(new CuentaMock(3));
-        arbol.insertar(new CuentaMock(4));
-        arbol.insertar(new CuentaMock(5));
+        // Al usar "1", "2", "3", "4", "5", el orden alfabético coincide con el numérico,
+        // provocando el desbalanceo secuencial hacia la derecha que activa el AVL.
+        arbol.insertar("1", new CuentaMock("1"));
+        arbol.insertar("2", new CuentaMock("2"));
+        arbol.insertar("3", new CuentaMock("3"));
+        arbol.insertar("4", new CuentaMock("4"));
+        arbol.insertar("5", new CuentaMock("5"));
 
-        // Un AVL con 5 elementos nunca debería tener altura mayor a 3
+        // Un AVL con 5 elementos equilibrados jamás debe superar la altura de 3
         assertTrue(arbol.mostrarAltura() <= 3, "El árbol debería estar balanceado (altura <= 3)");
     }
 
     @Test
     public void testEliminacion() {
-        arbol.insertar(new CuentaMock(10));
-        arbol.insertar(new CuentaMock(5));
-        arbol.eliminar(5);
+        CuentaMock c1 = new CuentaMock("10");
+        CuentaMock c2 = new CuentaMock("05");
 
-        assertNull(arbol.buscar(5), "El nodo debería haber sido eliminado.");
-        assertNotNull(arbol.buscar(10), "La raíz debería persistir.");
+        arbol.insertar(c1.getId(), c1);
+        arbol.insertar(c2.getId(), c2);
+
+        arbol.eliminar("05");
+
+        assertNull(arbol.buscar("05"), "El nodo debería haber sido eliminado.");
+        assertNotNull(arbol.buscar("10"), "La raíz debería persistir.");
     }
 }

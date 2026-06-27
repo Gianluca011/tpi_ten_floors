@@ -13,24 +13,22 @@ public class GestorInventario {
 
     // --- ALTA DE ÍTEMS ---
     public void agregarItem(Item nuevoItem) {
-        // Validación Defensiva (Estilo Lautaro): Si nos pasan un objeto nulo,
-        // cortamos la ejecución tirando una excepción en vez de que el programa explote más adelante.
         if (nuevoItem == null) {
             throw new IllegalArgumentException("El ítem no puede ser nulo.");
         }
-        // Llamamos al método matemático del TDA
-        arbolMochila.insertar(nuevoItem);
-        // Mensaje de consola homologado para el usuario
+
+        // Pasamos el ID (String) y el objeto ítem por separado al ABB
+        arbolMochila.insertar(nuevoItem.getId(), nuevoItem);
+
         System.out.println("[ABB] Has recogido: " + nuevoItem.getNombre());
     }
 
     // --- BAJA DE ÍTEMS ---
-    public void descartarItem(int idItem) {
-        // Primero verificamos si realmente existe en tiempo O(log n)
+    public void descartarItem(String idItem) {
+        // Primero verificamos si realmente existe mediante su ID de texto
         Item itemBuscado = arbolMochila.buscar(idItem);
 
         if (itemBuscado != null) {
-            // Si existe, lo borramos del árbol (contemplando los 3 casos de eliminación)
             arbolMochila.eliminar(idItem);
             System.out.println("[ABB] Has descartado: " + itemBuscado.getNombre());
         } else {
@@ -39,7 +37,7 @@ public class GestorInventario {
     }
 
     // --- BÚSQUEDA RÁPIDA ---
-    public Item buscarItem(int idItem) {
+    public Item buscarItem(String idItem) {
         return arbolMochila.buscar(idItem);
     }
 
@@ -47,8 +45,7 @@ public class GestorInventario {
     public void mostrarMochila() {
         System.out.println("\n--- INVENTARIO DEL JUGADOR ---");
 
-        // Le pedimos al TDA que haga un recorrido Inorden (Izquierda -> Raíz -> Derecha).
-        // Esto nos garantiza que la lista devuelta ya viene ordenada de menor a mayor ID.
+        // El recorrido Inorden nos garantiza el orden alfabético de los IDs de los ítems
         List<Item> itemsOrdenados = arbolMochila.obtenerInorden();
 
         if (itemsOrdenados.isEmpty()) {
@@ -56,7 +53,6 @@ public class GestorInventario {
             return;
         }
 
-        // Recorremos la lista ya procesada y la imprimimos prolijamente
         for (Item item : itemsOrdenados) {
             System.out.println(" -> " + item.toString());
         }
