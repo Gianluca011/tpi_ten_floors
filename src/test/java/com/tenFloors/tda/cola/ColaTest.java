@@ -23,9 +23,9 @@ public class ColaTest {
     public void setUp() {
         // Inicializamos una cola limpia y datos de prueba antes de cada test
         salaEspera = new Cola<>();
-        jugador1 = new Jugador("Gian_Swordsman", 15);
-        jugador2 = new Jugador("Axel_Rogue", 42);
-        jugador3 = new Jugador("Lauti_Mage", 28);
+        jugador1 = new Jugador("PJ00001", "Gian_Swordsman");
+        jugador2 = new Jugador("PJ00002", "Lau_Wizard");
+        jugador3 = new Jugador("PJ00003", "Axel_Tank");
     }
 
     @Test
