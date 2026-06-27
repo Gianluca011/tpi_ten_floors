@@ -27,7 +27,7 @@ public class ArbolAVLCuentas<T extends IIdentificable> {
         x.setDerecho(y);
         y.setIzquierdo(T2);
 
-        // Recalculamos alturas: Primero el nodo que bajó (y), luego el que subió (x)
+        // Recalculamos alturas: Primero el nodo que bajo (y), luego el que subio (x)
         y.setAltura(Math.max(altura(y.getIzquierdo()), altura(y.getDerecho())) + 1);
         x.setAltura(Math.max(altura(x.getIzquierdo()), altura(x.getDerecho())) + 1);
 
