@@ -1,0 +1,54 @@
+package main.java.com.tenFloors.model;
+
+import main.java.com.tenFloors.tda.avl.ArbolAVLCuentas;
+
+/**
+ * GESTOR DE NEGOCIO GLOBAL: Administra todas las cuentas del servidor.
+ * Delega la persistencia y el ordenamiento en el TDA Árbol AVL.
+ */
+public class GestorCuentas {
+
+    // El motor AVL. Configurado estrictamente para guardar objetos de tipo <Jugador>.
+    private final ArbolAVLCuentas<Jugador> indiceGlobalCuentas;
+
+    public GestorCuentas() {
+        this.indiceGlobalCuentas = new ArbolAVLCuentas<>();
+    }
+
+    // --- ALTA DE CUENTAS ---
+    public void registrarCuenta(Jugador jugador) {
+        if (jugador == null) {
+            throw new IllegalArgumentException("El jugador no puede ser nulo.");
+        }
+
+        // Regla de Negocio: No puede haber dos cuentas con el mismo ID.
+        // Hacemos una búsqueda previa O(log n) para asegurarnos.
+        if (indiceGlobalCuentas.buscar(jugador.getId()) != null) {
+            System.out.println("[AVL] Error: El ID " + jugador.getId() + " ya está registrado.");
+            return;
+        }
+
+        // Si pasa las validaciones, lo insertamos (el AVL se balanceará solo si es necesario)
+        indiceGlobalCuentas.insertar(jugador);
+        System.out.println("[AVL] Cuenta '" + jugador.getNombre() + "' dada de alta.");
+    }
+
+    // --- BAJA DE CUENTAS ---
+    public void darDeBajaCuenta(int idCuenta) {
+        // Buscamos para ver si el ID ingresado realmente existe
+        Jugador jugador = indiceGlobalCuentas.buscar(idCuenta);
+        if (jugador == null) {
+            System.out.println("[AVL] Error: No se encontró la cuenta con ID " + idCuenta);
+            return;
+        }
+
+        // Ejecutamos la eliminación. El TDA se encarga de reestructurar y recalcular las alturas.
+        indiceGlobalCuentas.eliminar(idCuenta);
+        System.out.println("[AVL] Cuenta de " + jugador.getNombre() + " eliminada.");
+    }
+
+    // --- BÚSQUEDA ---
+    public Jugador obtenerCuenta(int idCuenta) {
+        return indiceGlobalCuentas.buscar(idCuenta);
+    }
+}
