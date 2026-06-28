@@ -2,7 +2,9 @@ package main.java.com.tenFloors;
 
 import main.java.com.tenFloors.model.*;
 import main.java.com.tenFloors.tda.arbol.ArbolGenerico;
+import main.java.com.tenFloors.tda.cola.Cola;
 import main.java.com.tenFloors.tda.conjunto.Conjunto;
+import main.java.com.tenFloors.tda.grafo.Grafo;
 import main.java.com.tenFloors.tda.pila.Pila;
 import main.java.com.tenFloors.tda.avl.ArbolAVLCuentas;
 import main.java.com.tenFloors.tda.abb.ArbolABB;
@@ -22,6 +24,9 @@ public class Main {
     private static SistemaComercioSeguro sistemaComercio;
     private static final SistemaAuditoriaGremios sistemaAuditoria = new SistemaAuditoriaGremios();
     private static Gremio gremioDemo; // Definido de forma global para persistir en memoria síncrona
+    private static final Grafo<String> mapaGlobal = new Grafo<>();
+    private static final Conjunto<Jugador> jugadoresOnline = new Conjunto<>();
+    private static SistemaViajeParty sistemaViaje;
 
     public static void main(String[] args) {
         // Inicializamos el motor del hito técnico cruzando los índices requeridos
@@ -56,20 +61,18 @@ public class Main {
         scanner.close();
     }
 
-    /**
-     * Carga de datos mock controlados para validar el comportamiento del Hito 4 de forma autónoma.
-     */
+    //
+    // Carga de datos mock controlados para validar el comportamiento del Hito 4 de forma autónoma.
+    //
     private static void inicializarDatosDemo() {
 
-        /*
-        * Para Hito 4
-        * */
-        // 1. Poblamos el catálogo del servidor (ABB) con ítems íntegros
+        // Para Hito 4
+        // Poblamos el catálogo del servidor (ABB) con ítems íntegros
         baseGlobalItems.insertar("ITM-701", new ItemJuego("ITM-701", "Espada del Inframundo", "Legendaria"));
         baseGlobalItems.insertar("ITM-702", new ItemJuego("ITM-702", "Poción de Vida Mayor", "Común"));
         baseGlobalItems.insertar("ITM-703", new ItemJuego("ITM-703", "Escudo del Olimpo", "Épica"));
 
-        // 2. Registramos una cuenta de prueba para Lautaro Salto (ID: ACC-77)
+        // Registramos una cuenta de prueba para Lautaro Salto (ID: ACC-77)
         Jugador lauti = new Jugador("ACC-77", "Lauti_Salto");
         lauti.setNivel(60);
         lauti.setPisoActual(10);
@@ -79,15 +82,12 @@ public class Main {
         long tiempoActual = System.currentTimeMillis();
         cuentaLauti.getHistorialComercio().apilar(new Transaccion(5001L, "ITM-701", 9999.0, tiempoActual - 100000));
         cuentaLauti.getHistorialComercio().apilar(new Transaccion(5002L, "ITM-702", 150.0, tiempoActual - 20000));
-
         cuentaLauti.getInventario().insertar("ITM-703", baseGlobalItems.buscar("ITM-703"));
 
-        // 3. Insertamos la cuenta en el índice AVL global
+        // Insertamos la cuenta en el índice AVL global
         indiceCuentas.insertar(cuentaLauti.getJugador().getIdCuenta(), cuentaLauti);
 
-        /*
-        * Para Hito 3
-        * */
+        // Para Hito 3
         gremioDemo = new Gremio("Los Conquistadores de Aincrad", "LCA");
 
         // Registramos cuentas de oficiales adicionales en el AVL global de Axel
@@ -95,7 +95,6 @@ public class Main {
         cuentaGian.getJugador().setNivel(55);
         Cuenta cuentaAxel = new Cuenta(new Jugador("ACC-03", "Axel_Menz"));
         cuentaAxel.getJugador().setNivel(58);
-
         indiceCuentas.insertar("ACC-02", cuentaGian);
         indiceCuentas.insertar("ACC-03", cuentaAxel);
 
@@ -111,6 +110,21 @@ public class Main {
 
         // Forzamos la falla de auditoría metiendo una cuenta inexistente en el AVL
         tree.agregarHijo("ACC-03", "ACC-FANTASMA");
+
+        // Para Hito 1 (Viaje y Party)
+        // Mapeamos algunas zonas en el Grafo
+        mapaGlobal.agregarVertice("Pueblo de los Inicios");
+        mapaGlobal.agregarVertice("Bosque Oscuro");
+        mapaGlobal.agregarVertice("Mazmorra del Piso 10");
+        mapaGlobal.agregarArista("Pueblo de los Inicios", "Bosque Oscuro");
+        mapaGlobal.agregarArista("Bosque Oscuro", "Mazmorra del Piso 10");
+
+        // Conectamos jugadores (Lauti y Gian están online, Axel no)
+        jugadoresOnline.agregar(lauti);
+        jugadoresOnline.agregar(cuentaGian.getJugador());
+
+        // Inicializamos el motor del Hito 1
+        sistemaViaje = new SistemaViajeParty(mapaGlobal, jugadoresOnline);
     }
 
     // --- MENÚ PRINCIPAL ---
@@ -217,8 +231,8 @@ public class Main {
     // --- MENÚ 2: CONSULTAS COMPLEJAS ---
     private static void showConsultasComplejasMenu() {
         System.out.println("\n--- CONSULTAS COMPLEJAS (HITOS GRUPALES) ---");
-        System.out.println("1. Hito 1: Viaje Rápido y Formación de Party [Deshabilitado]");
-        System.out.println("2. Hito 2: Soporte Técnico VIP [Deshabilitado]");
+        System.out.println("1. Hito 1: Viaje Rápido y Formación de Party");
+        System.out.println("2. Hito 2: Soporte Técnico VIP [En desarrollo]");
         System.out.println("3. Hito 3: Auditoría de Gremios");
         System.out.println("4. Hito 4: Sistema de Comercio Seguro (Ejecutar Rollback)");
         System.out.println("5. <- Volver al Menú Principal");
@@ -226,7 +240,34 @@ public class Main {
 
         int opcion = leerOpcion();
         switch (opcion) {
-            case 1, 2 -> System.out.println("[INFO] Utilice la opción 4 para validar Comercio Seguro.");
+            case 1 -> {
+                System.out.println("\n--- EJECUCIÓN: HITO 1 (VIAJE RÁPIDO Y PARTY) ---");
+                // Simulamos un arreglo de jugadores que están en la zona buscando party
+                Jugador[] posiblesCandidatos = {
+                        indiceCuentas.buscar("ACC-77").getJugador(), // Lauti
+                        indiceCuentas.buscar("ACC-02").getJugador(), // Gian
+                        indiceCuentas.buscar("ACC-03").getJugador()  // Axel
+                };
+
+                // Ejecutamos el servicio cruzado
+                Cola<Jugador> partyArmada = sistemaViaje.solicitarViajeYArmarParty("Pueblo de los Inicios", "Mazmorra del Piso 10", posiblesCandidatos);
+
+                System.out.println("\n==================================================");
+                System.out.println("RESULTADO DE LA COLA DE PARTY (FIFO)");
+                System.out.println("==================================================");
+                if (partyArmada.estaVacia()) {
+                    System.out.println("Nadie se unió a la Party.");
+                } else {
+                    int posicion = 1;
+                    while (!partyArmada.estaVacia()) {
+                        Jugador j = partyArmada.desencolar();
+                        System.out.println("Slot " + posicion + ": " + j.getNombre() + " (Nivel " + j.getNivel() + ")");
+                        posicion++;
+                    }
+                }
+                System.out.println("==================================================");
+            }
+            case 2 -> System.out.println("[INFO] El Hito 2 (Soporte Técnico VIP) aún está en desarrollo.");
             case 3 -> {
                 System.out.println("\n--- EJECUCIÓN: HITO 3 (AUDITORÍA DE GREMIOS) ---");
                 System.out.println("Datos Generales del " + gremioDemo.toString());
