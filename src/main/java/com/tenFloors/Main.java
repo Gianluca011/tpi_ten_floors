@@ -217,7 +217,7 @@ public class Main {
     // --- MENÚ 2: CONSULTAS COMPLEJAS ---
     private static void showConsultasComplejasMenu() {
         System.out.println("\n--- CONSULTAS COMPLEJAS (HITOS GRUPALES) ---");
-        System.out.println("1. Hito 1: Viaje Rápido y Formación de Party");
+        System.out.println("1. Hito 1: Viaje Rápido y Formación de Party [En Desarrollo]");
         System.out.println("2. Hito 2: Soporte Técnico VIP [En Desarrollo]");
         System.out.println("3. Hito 3: Auditoría de Gremios");
         System.out.println("4. Hito 4: Sistema de Comercio Seguro (Ejecutar Rollback)");
