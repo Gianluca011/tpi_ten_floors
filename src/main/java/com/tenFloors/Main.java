@@ -31,7 +31,7 @@ public class Main {
         inicializarDatosDemo();
 
         System.out.println("==================================================");
-        System.out.println("             BIENVENIDOS A TEN FLOORS             ");
+        System.out.println("             BIENVENIDO A TEN FLOORS             ");
         System.out.println("==================================================");
 
         // Iniciamos el historial con el estado principal
@@ -217,9 +217,9 @@ public class Main {
     // --- MENÚ 2: CONSULTAS COMPLEJAS ---
     private static void showConsultasComplejasMenu() {
         System.out.println("\n--- CONSULTAS COMPLEJAS (HITOS GRUPALES) ---");
-        System.out.println("1. Hito 1: Viaje Rápido y Formación de Party [Deshabilitado]");
-        System.out.println("2. Hito 2: Soporte Técnico VIP [Deshabilitado]");
-        System.out.println("3. Hito 3: Auditoría de Gremios [Deshabilitado]");
+        System.out.println("1. Hito 1: Viaje Rápido y Formación de Party");
+        System.out.println("2. Hito 2: Soporte Técnico VIP [En Desarrollo]");
+        System.out.println("3. Hito 3: Auditoría de Gremios");
         System.out.println("4. Hito 4: Sistema de Comercio Seguro (Ejecutar Rollback)");
         System.out.println("5. <- Volver al Menú Principal");
         System.out.print("Seleccione una opción: ");
