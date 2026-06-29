@@ -1,5 +1,8 @@
-package main.java.com.tenFloors.model;
+package main.java.com.tenFloors.consulta;
 
+import main.java.com.tenFloors.model.Cuenta;
+import main.java.com.tenFloors.model.Gremio;
+import main.java.com.tenFloors.model.Jugador;
 import main.java.com.tenFloors.tda.arbol.ArbolGenerico;
 import main.java.com.tenFloors.tda.avl.ArbolAVL;
 import main.java.com.tenFloors.tda.conjunto.Conjunto;

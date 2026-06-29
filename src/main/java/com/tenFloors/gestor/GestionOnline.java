@@ -1,5 +1,6 @@
-package main.java.com.tenFloors.model;
+package main.java.com.tenFloors.gestor;
 
+import main.java.com.tenFloors.model.Jugador;
 import main.java.com.tenFloors.tda.conjunto.Conjunto;
 
 /**

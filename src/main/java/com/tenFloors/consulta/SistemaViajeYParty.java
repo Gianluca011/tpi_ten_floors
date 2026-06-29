@@ -1,5 +1,6 @@
-package main.java.com.tenFloors.model;
+package main.java.com.tenFloors.consulta;
 
+import main.java.com.tenFloors.model.Jugador;
 import main.java.com.tenFloors.tda.grafo.Grafo;
 import main.java.com.tenFloors.tda.conjunto.Conjunto;
 import main.java.com.tenFloors.tda.cola.Cola;

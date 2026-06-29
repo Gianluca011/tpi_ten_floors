@@ -1,5 +1,9 @@
-package main.java.com.tenFloors.model;
+package main.java.com.tenFloors.consulta;
 
+import main.java.com.tenFloors.model.Cuenta;
+import main.java.com.tenFloors.model.Item;
+import main.java.com.tenFloors.model.Ticket;
+import main.java.com.tenFloors.model.Transaccion;
 import main.java.com.tenFloors.tda.colaPrioridad.ColaPrioridad;
 import main.java.com.tenFloors.tda.arbolB.ArbolB;
 import main.java.com.tenFloors.tda.avl.ArbolAVL;

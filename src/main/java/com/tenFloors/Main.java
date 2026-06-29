@@ -1,5 +1,6 @@
 package main.java.com.tenFloors;
 
+import main.java.com.tenFloors.controlador.ControladorJuego;
 import main.java.com.tenFloors.model.*;
 import main.java.com.tenFloors.tda.cola.Cola;
 import main.java.com.tenFloors.tda.pila.Pila;

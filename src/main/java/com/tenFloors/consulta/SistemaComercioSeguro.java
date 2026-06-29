@@ -1,5 +1,8 @@
-package main.java.com.tenFloors.model;
+package main.java.com.tenFloors.consulta;
 
+import main.java.com.tenFloors.model.Cuenta;
+import main.java.com.tenFloors.model.Item;
+import main.java.com.tenFloors.model.Transaccion;
 import main.java.com.tenFloors.tda.avl.ArbolAVL;
 import main.java.com.tenFloors.tda.abb.ArbolABB;
 import main.java.com.tenFloors.tda.pila.Pila;

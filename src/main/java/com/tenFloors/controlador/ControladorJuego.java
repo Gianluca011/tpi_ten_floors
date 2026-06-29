@@ -1,5 +1,11 @@
-package main.java.com.tenFloors.model;
+package main.java.com.tenFloors.controlador;
 
+import main.java.com.tenFloors.consulta.SistemaAuditoriaGremios;
+import main.java.com.tenFloors.consulta.SistemaComercioSeguro;
+import main.java.com.tenFloors.consulta.SistemaSoporteVIP;
+import main.java.com.tenFloors.consulta.SistemaViajeYParty;
+import main.java.com.tenFloors.gestor.GestorMisiones;
+import main.java.com.tenFloors.model.*;
 import main.java.com.tenFloors.tda.arbol.ArbolGenerico;
 import main.java.com.tenFloors.tda.arbolB.ArbolB;
 import main.java.com.tenFloors.tda.cola.Cola;
@@ -75,9 +81,9 @@ public class ControladorJuego {
         arbolHabilidadesGlobal.agregarHijo(catTacticasSigilo, new ClaseHabilidad("Manto de Invisibilidad", "HABILIDAD", 35));
 
         // Catálogo global en ABB
-        baseGlobalItems.insertar("ITM-701", new ItemJuego("ITM-701", "Espada del Inframundo", "Legendaria"));
-        baseGlobalItems.insertar("ITM-702", new ItemJuego("ITM-702", "Poción de Vida Mayor", "Común"));
-        baseGlobalItems.insertar("ITM-703", new ItemJuego("ITM-703", "Escudo del Olimpo", "Épica"));
+        baseGlobalItems.insertar("ITM-701", new Item("ITM-701", "Espada del Inframundo", "Legendaria"));
+        baseGlobalItems.insertar("ITM-702", new Item("ITM-702", "Poción de Vida Mayor", "Común"));
+        baseGlobalItems.insertar("ITM-703", new Item("ITM-703", "Escudo del Olimpo", "Épica"));
 
         // Cuenta base de Lautaro Salto (ID: ACC-77)
         Jugador lauti = new Jugador("ACC-77", "Lauti_Salto", "MAGO");
