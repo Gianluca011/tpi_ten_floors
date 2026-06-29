@@ -1,5 +1,8 @@
 package main.java.com.tenFloors.tda.avl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ArbolAVL<T> {
     private NodoAVL<T> raiz;
 
@@ -145,5 +148,19 @@ public class ArbolAVL<T> {
         }
 
         return n;
+    }
+    // RECORRIDO INORDEN (Devuelve lista ordenada alfabéticamente por ID)
+    public List<T> obtenerInorden() {
+        List<T> lista = new ArrayList<>();
+        inordenRec(raiz, lista);
+        return lista;
+    }
+
+    private void inordenRec(NodoAVL<T> nodo, List<T> lista) {
+        if (nodo != null) {
+            inordenRec(nodo.getIzquierdo(), lista);
+            lista.add(nodo.getDato());
+            inordenRec(nodo.getDerecho(), lista);
+        }
     }
 }
