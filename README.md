@@ -66,8 +66,7 @@ ten-floors-mmorpg/
 │   │               │     ├── ClaseHabilidad.java
 │   │               │     ├── Cuenta.java
 │   │               │     ├── Gremio.java
-│   │               │     ├── Item.java           # Ojo: revisen si "Item" e "ItemJuego" no están duplicados
-│   │               │     ├── ItemJuego.java
+│   │               │     ├── Item.java
 │   │               │     ├── Jugador.java
 │   │               │     ├── Mision.java
 │   │               │     ├── Ticket.java
