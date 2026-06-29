@@ -2,7 +2,9 @@ package main.java.com.tenFloors;
 
 import main.java.com.tenFloors.model.*;
 import main.java.com.tenFloors.tda.arbol.ArbolGenerico;
+import main.java.com.tenFloors.tda.arbolB.ArbolB;
 import main.java.com.tenFloors.tda.cola.Cola;
+import main.java.com.tenFloors.tda.colaPrioridad.ColaPrioridad;
 import main.java.com.tenFloors.tda.conjunto.Conjunto;
 import main.java.com.tenFloors.tda.grafo.Grafo;
 import main.java.com.tenFloors.tda.pila.Pila;
@@ -27,10 +29,14 @@ public class Main {
     private static final Grafo<String> mapaGlobal = new Grafo<>();
     private static final Conjunto<Jugador> jugadoresOnline = new Conjunto<>();
     private static SistemaViajeYParty sistemaViaje;
+    private static final ColaPrioridad<Ticket> colaTicketsVIP = new ColaPrioridad<>();
+    private static final ArbolB<Transaccion> historialSubastas = new ArbolB<>(2); // Configurado con grado mínimo t = 2
+    private static SistemaSoporteVIP sistemaSoporte;
 
     public static void main(String[] args) {
         // Inicializamos el motor del hito técnico cruzando los índices requeridos
         sistemaComercio = new SistemaComercioSeguro(indiceCuentas, baseGlobalItems);
+        sistemaSoporte = new SistemaSoporteVIP(colaTicketsVIP, historialSubastas, indiceCuentas, baseGlobalItems);
 
         // Pre-carga de datos reales para posibilitar pruebas inmediatas sin placeholders
         inicializarDatosDemo();
@@ -128,6 +134,17 @@ public class Main {
 
         // Inicializamos el motor del Hito 1
         sistemaViaje = new SistemaViajeYParty(mapaGlobal, jugadoresOnline);
+
+        // --- CARGA DE DATOS PARA HITO 2 (SOPORTE VIP) ---
+        // 1. Poblamos el historial global de subastas del Árbol B (Usando IDs como claves numéricas)
+        historialSubastas.insertar(90001L, new Transaccion(90001L, "ITM-701", 15000.0, System.currentTimeMillis() - 400000));
+        historialSubastas.insertar(90002L, new Transaccion(90002L, "ITM-703", 45000.0, System.currentTimeMillis() - 200000));
+
+        // 2. Encolamos reclamos con prioridades explícitas en el Heap ordenado
+        // Ticket de Gianluca (Prioridad media = 3)
+        colaTicketsVIP.insertar(new Ticket(1001L, "ACC-02", 90001L, "Compré una espada pero se me desconectó el cliente y no la veo", 3), 3);
+        // Ticket de Lautaro (Prioridad Crítica VIP = 9) -> Debe salir primero por máxima urgencia
+        colaTicketsVIP.insertar(new Ticket(1002L, "ACC-77", 90002L, "Perdí mis fondos y el escudo del Olimpo falló al reclamarse", 9), 9);
     }
 
     // --- MENÚ PRINCIPAL ---
@@ -273,7 +290,17 @@ public class Main {
                 }
                 System.out.println("==================================================");
             }
-            case 2 -> System.out.println("[INFO] El Hito 2 (Soporte Técnico VIP) aún está en desarrollo.");
+            case 2 -> {
+                System.out.println("\n--- EJECUCIÓN: HITO 2 (SOPORTE TÉCNICO VIP) ---");
+                // Se atiende el ticket más prioritario del servidor otorgándole como compensación
+                // un ítem válido del catálogo global (en este caso, la Espada del Inframundo: ITM-701)
+                boolean exitoSoporte = sistemaSoporte.atenderProximoTicket("ITM-701");
+                if (exitoSoporte) {
+                    System.out.println("[SISTEMA] Operación de Soporte VIP finalizada correctamente.");
+                } else {
+                    System.out.println("[SISTEMA] No se pudo procesar ningún ticket.");
+                }
+            }
             case 3 -> {
                 System.out.println("\n--- EJECUCIÓN: HITO 3 (AUDITORÍA DE GREMIOS) ---");
                 System.out.println("Datos Generales del " + gremioDemo.toString());
