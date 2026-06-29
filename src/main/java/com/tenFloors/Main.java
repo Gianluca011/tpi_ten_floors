@@ -1,15 +1,8 @@
 package main.java.com.tenFloors;
 
 import main.java.com.tenFloors.model.*;
-import main.java.com.tenFloors.tda.arbol.ArbolGenerico;
-import main.java.com.tenFloors.tda.arbolB.ArbolB;
 import main.java.com.tenFloors.tda.cola.Cola;
-import main.java.com.tenFloors.tda.colaPrioridad.ColaPrioridad;
-import main.java.com.tenFloors.tda.conjunto.Conjunto;
-import main.java.com.tenFloors.tda.grafo.Grafo;
 import main.java.com.tenFloors.tda.pila.Pila;
-import main.java.com.tenFloors.tda.avl.ArbolAVL;
-import main.java.com.tenFloors.tda.abb.ArbolABB;
 
 import java.util.Scanner;
 
@@ -19,34 +12,17 @@ public class Main {
     private static final Pila<String> historialMenus = new Pila<>();
     private static boolean running = true;
 
-    // Almacenamiento síncrono e Índices globales para la ejecución del ecosistema
-    private static final ArbolAVL<Cuenta> indiceCuentas = new ArbolAVL<>();
-    private static final ArbolABB<Item> baseGlobalItems = new ArbolABB<>();
-    private static final GestorMisiones gestorMisiones = new GestorMisiones();
-    private static SistemaComercioSeguro sistemaComercio;
-    private static final SistemaAuditoriaGremios sistemaAuditoria = new SistemaAuditoriaGremios();
-    private static Gremio gremioDemo; // Definido de forma global para persistir en memoria síncrona
-    private static final Grafo<String> mapaGlobal = new Grafo<>();
-    private static final Conjunto<Jugador> jugadoresOnline = new Conjunto<>();
-    private static SistemaViajeYParty sistemaViaje;
-    private static final ColaPrioridad<Ticket> colaTicketsVIP = new ColaPrioridad<>();
-    private static final ArbolB<Transaccion> historialSubastas = new ArbolB<>(2); // Configurado con grado mínimo t = 2
-    private static SistemaSoporteVIP sistemaSoporte;
-    private static final ArbolGenerico<ClaseHabilidad> arbolHabilidadesGlobal = new ArbolGenerico<>();
+    // Instancia única del Controlador del Juego según patrón GRASP
+    private static ControladorJuego controlador;
 
     public static void main(String[] args) {
-        // Inicializamos el motor del hito técnico cruzando los índices requeridos
-        sistemaComercio = new SistemaComercioSeguro(indiceCuentas, baseGlobalItems);
-        sistemaSoporte = new SistemaSoporteVIP(colaTicketsVIP, historialSubastas, indiceCuentas, baseGlobalItems);
-
-        // Pre-carga de datos reales para posibilitar pruebas inmediatas sin placeholders
-        inicializarDatosDemo();
+        // Inicializamos el controlador maestro
+        controlador = new ControladorJuego();
 
         System.out.println("==================================================");
         System.out.println("             BIENVENIDO A TEN FLOORS             ");
         System.out.println("==================================================");
 
-        // Iniciamos el historial con el estado principal
         historialMenus.apilar("PRINCIPAL");
 
         // Bucle principal de ejecución de consola
@@ -67,146 +43,6 @@ public class Main {
 
         System.out.println("\n[SISTEMA] Servidor cerrado correctamente.");
         scanner.close();
-    }
-
-    /**
-     * Carga de datos mock controlados para validar el comportamiento del Hito 4 de forma autónoma.
-     */
-    private static void inicializarDatosDemo() {
-
-        // --- CARGA DE DATOS PARA ÁRBOL DE HABILIDADES (ÁRBOL GENÉRICO) ---
-        // 1. Definimos la RAÍZ MAESTRA del servidor (Contenedor global)
-        ClaseHabilidad raizServidor = new ClaseHabilidad("RAIZ", "SISTEMA", 0);
-        arbolHabilidadesGlobal.agregarHijo(null, raizServidor);
-
-        // ==========================================
-        // RAMA 1: ESPADACHÍN
-        // ==========================================
-        ClaseHabilidad espadachin = new ClaseHabilidad("ESPADACHIN", "CLASE", 1);
-        arbolHabilidadesGlobal.agregarHijo(raizServidor, espadachin); // Hijo de la raíz maestro
-
-        ClaseHabilidad catActivasEspada = new ClaseHabilidad("Habilidades Activas", "CATEGORIA", 1);
-        ClaseHabilidad catPasivasEspada = new ClaseHabilidad("Habilidades Pasivas", "CATEGORIA", 1);
-        arbolHabilidadesGlobal.agregarHijo(espadachin, catActivasEspada);
-        arbolHabilidadesGlobal.agregarHijo(espadachin, catPasivasEspada);
-
-        arbolHabilidadesGlobal.agregarHijo(catActivasEspada, new ClaseHabilidad("Estocada Certera", "HABILIDAD", 10));
-        arbolHabilidadesGlobal.agregarHijo(catActivasEspada, new ClaseHabilidad("Torbellino de Espadas", "HABILIDAD", 30));
-        arbolHabilidadesGlobal.agregarHijo(catPasivasEspada, new ClaseHabilidad("Maestría en Espadas", "HABILIDAD", 5));
-
-        // ==========================================
-        // RAMA 2: MAGO (Demostración de Multi-clase)
-        // ==========================================
-        ClaseHabilidad mago = new ClaseHabilidad("MAGO", "CLASE", 1);
-        arbolHabilidadesGlobal.agregarHijo(raizServidor, mago); // Hermano de Espadachín, hijo de la raíz maestro
-
-        ClaseHabilidad catHechizos = new ClaseHabilidad("Hechizos de Destrucción", "CATEGORIA", 1);
-        arbolHabilidadesGlobal.agregarHijo(mago, catHechizos);
-
-        arbolHabilidadesGlobal.agregarHijo(catHechizos, new ClaseHabilidad("Bola de Fuego", "HABILIDAD", 5));
-        arbolHabilidadesGlobal.agregarHijo(catHechizos, new ClaseHabilidad("Ventisca Helada", "HABILIDAD", 20));
-        arbolHabilidadesGlobal.agregarHijo(catHechizos, new ClaseHabilidad("Impacto Trueno", "HABILIDAD", 40));
-
-        // ==========================================
-        // RAMA 3: ASESINO (Especialista en Críticos)
-        // ==========================================
-        ClaseHabilidad asesino = new ClaseHabilidad("ASESINO", "CLASE", 1);
-        arbolHabilidadesGlobal.agregarHijo(raizServidor, asesino); // Hermano de Espadachín y Mago, hijo de la raíz maestro
-
-        ClaseHabilidad catArtesAsesinato = new ClaseHabilidad("Artes del Asesinato", "CATEGORIA", 1);
-        ClaseHabilidad catTacticasSigilo = new ClaseHabilidad("Tácticas de Sigilo", "CATEGORIA", 1);
-        arbolHabilidadesGlobal.agregarHijo(asesino, catArtesAsesinato);
-        arbolHabilidadesGlobal.agregarHijo(asesino, catTacticasSigilo);
-
-        // Habilidades de Artes del Asesinato
-        arbolHabilidadesGlobal.agregarHijo(catArtesAsesinato, new ClaseHabilidad("Emboscada", "HABILIDAD", 5));
-        arbolHabilidadesGlobal.agregarHijo(catArtesAsesinato, new ClaseHabilidad("Hoja Envenenada", "HABILIDAD", 12));
-        arbolHabilidadesGlobal.agregarHijo(catArtesAsesinato, new ClaseHabilidad("Ejecución", "HABILIDAD", 45));
-
-        // Habilidades de Tácticas de Sigilo
-        arbolHabilidadesGlobal.agregarHijo(catTacticasSigilo, new ClaseHabilidad("Paso Sombrío", "HABILIDAD", 20));
-        arbolHabilidadesGlobal.agregarHijo(catTacticasSigilo, new ClaseHabilidad("Manto de Invisibilidad", "HABILIDAD", 35));
-
-        // Para Hito 4
-        // 1. Poblamos el catálogo del servidor (ABB) con ítems íntegros
-        baseGlobalItems.insertar("ITM-701", new ItemJuego("ITM-701", "Espada del Inframundo", "Legendaria"));
-        baseGlobalItems.insertar("ITM-702", new ItemJuego("ITM-702", "Poción de Vida Mayor", "Común"));
-        baseGlobalItems.insertar("ITM-703", new ItemJuego("ITM-703", "Escudo del Olimpo", "Épica"));
-
-        // 2. Registramos una cuenta de prueba para Lautaro Salto (ID: ACC-77)
-        Jugador lauti = new Jugador("ACC-77", "Lauti_Salto", "MAGO");
-        lauti.setNivel(60);
-        lauti.setPisoActual(10);
-        Cuenta cuentaLauti = new Cuenta(lauti);
-
-        // Simulamos que Lauti vendió la Espada y la Poción (Se apilan en su historial comercial)
-        long tiempoActual = System.currentTimeMillis();
-        cuentaLauti.getHistorialComercio().apilar(new Transaccion(5001L, "ITM-701", 9999.0, tiempoActual - 100000));
-        cuentaLauti.getHistorialComercio().apilar(new Transaccion(5002L, "ITM-702", 150.0, tiempoActual - 20000));
-
-        cuentaLauti.getInventario().insertar("ITM-703", baseGlobalItems.buscar("ITM-703"));
-
-        // 3. Insertamos la cuenta en el índice AVL global
-        indiceCuentas.insertar(cuentaLauti.getJugador().getIdCuenta(), cuentaLauti);
-
-        // Para Hito 3
-        gremioDemo = new Gremio("Los Conquistadores de Aincrad", "LCA");
-
-        // Registramos cuentas de oficiales adicionales en el AVL global de Axel
-        Cuenta cuentaGian = new Cuenta(new Jugador("ACC-02", "Gian_Chia", "ESPADACHIN"));
-        cuentaGian.getJugador().setNivel(12);
-        Cuenta cuentaAxel = new Cuenta(new Jugador("ACC-03", "Axel_Menz", "ASESINO"));
-        cuentaAxel.getJugador().setNivel(32);
-
-        indiceCuentas.insertar("ACC-02", cuentaGian);
-        indiceCuentas.insertar("ACC-03", cuentaAxel);
-
-        // Accedemos al árbol interno del gremio para establecer los rangos
-        ArbolGenerico<String> tree = gremioDemo.getEstructuraJerarquica();
-
-        // El Guild Master en la raíz (Padre null) es Lauti
-        tree.agregarHijo(null, "ACC-77");
-
-        // Gian y Axel son Oficiales directos de Lauti
-        tree.agregarHijo("ACC-77", "ACC-02");
-        tree.agregarHijo("ACC-77", "ACC-03");
-
-        // Forzamos la falla de auditoría metiendo una cuenta inexistente en el AVL
-        tree.agregarHijo("ACC-03", "ACC-FANTASMA");
-
-        // Para Hito 1 (Viaje y Party)
-        // Mapeamos algunas zonas en el Grafo
-        mapaGlobal.agregarVertice("Pueblo de los Inicios");
-        mapaGlobal.agregarVertice("Bosque Oscuro");
-        mapaGlobal.agregarVertice("Mazmorra del Piso 10");
-        mapaGlobal.agregarArista("Pueblo de los Inicios", "Bosque Oscuro");
-        mapaGlobal.agregarArista("Bosque Oscuro", "Mazmorra del Piso 10");
-
-        // Conectamos jugadores (Lauti y Gian están online, Axel no)
-        jugadoresOnline.agregar(lauti);
-        jugadoresOnline.agregar(cuentaGian.getJugador());
-
-        // Inicializamos el motor del Hito 1
-        sistemaViaje = new SistemaViajeYParty(mapaGlobal, jugadoresOnline);
-
-        // --- CARGA DE DATOS PARA HITO 2 (SOPORTE VIP) ---
-        // 1. Poblamos el historial global de subastas del Árbol B (Usando IDs como claves numéricas)
-        historialSubastas.insertar(90001L, new Transaccion(90001L, "ITM-701", 15000.0, System.currentTimeMillis() - 400000));
-        historialSubastas.insertar(90002L, new Transaccion(90002L, "ITM-703", 45000.0, System.currentTimeMillis() - 200000));
-
-        // 2. Encolamos reclamos con prioridades explícitas en el Heap ordenado
-        // Ticket de Gianluca (Prioridad media = 3)
-        colaTicketsVIP.insertar(new Ticket(1001L, "ACC-02", 90001L, "Compré una espada pero se me desconectó el cliente y no la veo", 3), 3);
-        // Ticket de Lautaro (Prioridad Crítica VIP = 9) -> Debe salir primero por máxima urgencia
-        colaTicketsVIP.insertar(new Ticket(1002L, "ACC-77", 90002L, "Perdí mis fondos y el escudo del Olimpo falló al reclamarse", 9), 9);
-
-        gestorMisiones.registrarMision(new Mision(1, "Juntar 10 Hierbas Curativas", "Misión básica de recolección.", Mision.TipoMision.RECOLECCION_ESTANDAR, 1, "ITM-702"));
-        gestorMisiones.registrarMision(new Mision(2, "Matar al Dragón Ancestral", "Derrotar al jefe supremo de la torre.", Mision.TipoMision.JEFE_MUNDO, 10, "ITM-701"));
-        gestorMisiones.registrarMision(new Mision(3, "Festival de la Luna", "Evento temporal de recolección nocturna.", Mision.TipoMision.EVENTO_TEMPORAL, 3, "ITM-703"));
-        gestorMisiones.registrarMision(new Mision(4, "Invasión de Orcos", "Frenar la oleada antes de que destruyan el campamento.", Mision.TipoMision.EVENTO_TEMPORAL, 5, "ITM-702"));
-
-        sincronizarHabilidadesAutomatica(lauti);
-        sincronizarHabilidadesAutomatica(cuentaGian.getJugador());
     }
 
     // --- MENÚ PRINCIPAL ---
@@ -249,10 +85,7 @@ public class Main {
                 System.out.println("Ingrese la clase del presonaje (MAGO/ASESINO/ESPADACHIN): ");
                 String clase = scanner.nextLine().trim().toUpperCase();
                 if (!id.isEmpty() && !nombre.isEmpty()) {
-                    Cuenta nuevaCuenta = new Cuenta(new Jugador(id, nombre, clase));
-                    sincronizarHabilidadesAutomatica(nuevaCuenta.getJugador());
-                    indiceCuentas.insertar(id, nuevaCuenta);
-                    System.out.println("[AVL] Cuenta registrada e índice rebalanceado exitosamente.");
+                    controlador.darAltaCuenta(id, nombre, clase);
                 } else {
                     System.out.println("[ERROR] Entradas vacías no permitidas.");
                 }
@@ -260,8 +93,7 @@ public class Main {
             case 2 -> {
                 System.out.print("Ingrese el ID de la cuenta a dar de baja: ");
                 String id = scanner.nextLine().trim();
-                if (indiceCuentas.buscar(id) != null) {
-                    indiceCuentas.eliminar(id);
+                if (controlador.darBajaCuenta(id)) {
                     System.out.println("[AVL] Cuenta removida correctamente. Árbol auto-balanceado.");
                 } else {
                     System.out.println("[ERROR] La cuenta especificada no existe.");
@@ -270,25 +102,20 @@ public class Main {
             case 3 -> {
                 System.out.print("Ingrese el ID de cuenta del jugador: ");
                 String idC = scanner.nextLine().trim();
-                Cuenta c = indiceCuentas.buscar(idC);
-                if (c != null) {
-                    System.out.print("Ingrese ID de ítem del catálogo (ITM-701, ITM-702, ITM-703): ");
-                    String idI = scanner.nextLine().trim();
-                    Item it = baseGlobalItems.buscar(idI);
-                    if (it != null) {
-                        c.getInventario().insertar(idI, it);
-                        System.out.println("[ABB] Ítem indexado en el inventario del jugador.");
-                    } else {
-                        System.out.println("[ERROR] Ítem inexistente en el catálogo global ABB.");
-                    }
-                } else {
-                    System.out.println("[ERROR] Cuenta no encontrada.");
+                System.out.print("Ingrese ID de ítem del catálogo (ITM-701, ITM-702, ITM-703): ");
+                String idI = scanner.nextLine().trim();
+
+                int resultado = controlador.agregarItemMochila(idC, idI);
+                switch (resultado) {
+                    case 0 -> System.out.println("[ABB] Ítem indexado en el inventario del jugador.");
+                    case 1 -> System.out.println("[ERROR] Cuenta no encontrada.");
+                    case 2 -> System.out.println("[ERROR] Ítem inexistente en el catálogo global ABB.");
                 }
             }
             case 4 -> {
                 System.out.print("Ingrese ID de cuenta a inspeccionar (Pruebe con 'ACC-77'): ");
                 String id = scanner.nextLine().trim();
-                Cuenta c = indiceCuentas.buscar(id);
+                Cuenta c = controlador.buscarCuenta(id);
                 if (c != null) {
                     System.out.println("\n==================================================");
                     System.out.println("AUDITORÍA DE CUENTA AVL: " + c.getJugador().getIdCuenta());
@@ -312,11 +139,8 @@ public class Main {
                         System.out.println("   [No cumple requisitos para ninguna habilidad de su clase]");
                     } else {
                         String[] habilidadesCatalogo = {
-                                // Espadachín
                                 "Estocada Certera", "Torbellino de Espadas", "Golpe de Escudo", "Maestría en Espadas", "Reflejos de Acero", "Coraza de Titán",
-                                // Mago
                                 "Bola de Fuego", "Ventisca Helada", "Impacto Trueno",
-                                // Asesino
                                 "Emboscada", "Hoja Envenenada", "Ejecución", "Paso Sombrío", "Manto de Invisibilidad"
                         };
                         for (String hab : habilidadesCatalogo) {
@@ -360,73 +184,20 @@ public class Main {
                 String recompensaM = scanner.nextLine().trim().toUpperCase();
 
                 if (idM > 0 && !nomM.isEmpty() && !recompensaM.isEmpty()) {
-                    gestorMisiones.registrarMision(new Mision(idM, nomM, descM, tipoM, pisoM, recompensaM));
-                    System.out.println("[COLA PRIORIDAD] Misión integrada y reordenada en el pool global.");
+                    controlador.registrarNuevaMision(idM, nomM, descM, tipoM, pisoM, recompensaM);
                 } else {
                     System.out.println("[ERROR] Datos inválidos o recompensa vacía. Cancelando alta.");
                 }
             }
             case 6 -> {
                 System.out.println("\n--- SISTEMA DE DESPACHO Y COMPLETITUD DE MISIONES ---");
-
-                if (gestorMisiones.getCantidadMisionesPendientes() == 0) {
+                if (controlador.getCantidadMisionesPendientes() == 0) {
                     System.out.println("[SISTEMA] No hay misiones activas pendientes en el registro.");
                     break;
                 }
-
-                // 1. Solicitamos el jugador que reclama haber terminado la hazaña
                 System.out.print("Ingrese el ID de la cuenta del jugador que completó la hazaña (ej. ACC-77): ");
                 String idCuenta = scanner.nextLine().trim().toUpperCase();
-
-                Cuenta cuentaJugador = indiceCuentas.buscar(idCuenta);
-                if (cuentaJugador == null) {
-                    System.out.println("[ERROR] La cuenta especificada no existe en el índice AVL global.");
-                    break;
-                }
-
-                Jugador jugador = cuentaJugador.getJugador();
-
-                // 2. Extraemos de forma destructiva la misión con mayor prioridad del servidor
-                Mision misionUrgente = gestorMisiones.procesarSiguienteMision();
-
-                if (misionUrgente != null) {
-                    System.out.println("\n==================================================");
-                    System.out.println("PROCESANDO RECLAMO DE MISIÓN CRÍTICA");
-                    System.out.println("==================================================");
-                    System.out.println("Evaluando a : " + jugador.getNombre() + " (Piso Actual: " + jugador.getPisoActual() + ")");
-                    System.out.println("Misión       : " + misionUrgente.getNombre() + " [" + misionUrgente.getTipo() + "]");
-                    System.out.println("Requisito    : Piso " + misionUrgente.getPisoRequerido() + " de la torre.");
-
-                    // 3. Validación de Regla de Dominio: ¿El jugador está o estuvo en el piso requerido?
-                    if (jugador.getPisoActual() < misionUrgente.getPisoRequerido()) {
-                        System.out.println("\n[RECHAZADO] El jugador no cumple con el piso requerido para esta misión.");
-                        System.out.println("[SISTEMA] La misión se descarta por intento de fraude o nivel insuficiente.");
-                        System.out.println("==================================================");
-                        break;
-                    }
-
-                    // 4. Búsqueda e indexación de la recompensa cruzando los ABB
-                    String idPremio = misionUrgente.getIdItemRecompensa();
-                    Item premioCatalogo = baseGlobalItems.buscar(idPremio);
-
-                    if (premioCatalogo != null) {
-                        // Insertamos el ítem directamente en el ABB privado de la mochila del jugador
-                        cuentaJugador.getInventario().insertar(idPremio, premioCatalogo);
-                        System.out.println("¡RECOMPENSA OTORGADA! Se añadió '" + premioCatalogo.toString() + "' a su mochila [ABB].");
-                    } else {
-                        System.out.println("[ALERTA] El ítem de recompensa (" + idPremio + ") no existe en el catálogo maestro.");
-                    }
-
-                    // 5. Progreso del personaje: Le otorgamos un bonus de nivel por completar la misión
-                    int nivelViejo = jugador.getNivel();
-                    jugador.setNivel(nivelViejo + 2); // Sube 2 niveles de golpe
-                    System.out.println("¡SUBIDA DE NIVEL! El personaje progresó: Lvl " + nivelViejo + " -> Lvl " + jugador.getNivel());
-
-                    // 6. Sincronización del Árbol Genérico: Buscamos si desbloqueó nuevos poderes con su nuevo nivel
-                    sincronizarHabilidadesAutomatica(jugador);
-                    System.out.println("[SISTEMA] Árbol de habilidades re-evaluado para la clase: " + jugador.getClase());
-                    System.out.println("==================================================");
-                }
+                controlador.procesarDespachoMision(idCuenta);
             }
             case 7 -> historialMenus.apilar("CONSULTAS_DATOS");
             case 8 -> historialMenus.desapilar();
@@ -446,82 +217,20 @@ public class Main {
 
         int opcion = leerOpcion();
         switch (opcion) {
-            case 1 -> {
-                System.out.println("\n--- EJECUCIÓN: HITO 1 (VIAJE RÁPIDO Y PARTY) ---");
-                // Simulamos un arreglo de jugadores que están en la zona buscando party
-                Jugador[] posiblesCandidatos = {
-                        indiceCuentas.buscar("ACC-77").getJugador(), // Lauti
-                        indiceCuentas.buscar("ACC-02").getJugador(), // Gian
-                        indiceCuentas.buscar("ACC-03").getJugador()  // Axel
-                };
-
-                // Ejecutamos el servicio cruzado
-                Cola<Jugador> partyArmada = sistemaViaje.solicitarViajeYArmarParty("Pueblo de los Inicios", "Mazmorra del Piso 10", posiblesCandidatos);
-
-                System.out.println("\n==================================================");
-                System.out.println("RESULTADO DE LA COLA DE PARTY (FIFO)");
-                System.out.println("==================================================");
-                if (partyArmada.estaVacia()) {
-                    System.out.println("Nadie se unió a la Party.");
-                } else {
-                    int posicion = 1;
-                    while (!partyArmada.estaVacia()) {
-                        Jugador j = partyArmada.desencolar();
-                        System.out.println("Slot " + posicion + ": " + j.getNombre() + " (Nivel " + j.getNivel() + ")");
-                        posicion++;
-                    }
-                }
-                System.out.println("==================================================");
-            }
-            case 2 -> {
-                System.out.println("\n--- EJECUCIÓN: HITO 2 (SOPORTE TÉCNICO VIP) ---");
-                // Se atiende el ticket más prioritario del servidor otorgándole como compensación
-                // un ítem válido del catálogo global (en este caso, la Espada del Inframundo: ITM-701)
-                boolean exitoSoporte = sistemaSoporte.atenderProximoTicket("ITM-701");
-                if (exitoSoporte) {
-                    System.out.println("[SISTEMA] Operación de Soporte VIP finalizada correctamente.");
-                } else {
-                    System.out.println("[SISTEMA] No se pudo procesar ningún ticket.");
-                }
-            }
-            case 3 -> {
-                System.out.println("\n--- EJECUCIÓN: HITO 3 (AUDITORÍA DE GREMIOS) ---");
-                System.out.println("Datos Generales del " + gremioDemo.toString());
-                System.out.println("Visualización estructural por Consola (Preorden del TDA):");
-
-                // Invocamos el preorden nativo de Gianluca para pintar las sangrías en consola
-                gremioDemo.getEstructuraJerarquica().preorden();
-
-                // Disparamos el motor cruzado de los 3 TDAs pasando el objeto Gremio
-                Conjunto<Jugador> lideresAudita = sistemaAuditoria.auditarLideresGremio(gremioDemo, indiceCuentas);
-
-                System.out.println("\n==================================================");
-                System.out.println("RESULTADO DE CONSOLIDACIÓN EN CONJUNTO TEMPORAL");
-                System.out.println("==================================================");
-                System.out.println("Total de líderes únicos validados y almacenados: " + lideresAudita.getTamanio());
-                System.out.println("Verificación de Existencia de Claves:");
-                System.out.println("   ¿Se consolidó al GM (ACC-77)?: " + lideresAudita.contiene(new Jugador("ACC-77", "", "")));
-                System.out.println("   ¿Se consolidó al ID FANTASMA?: " + lideresAudita.contiene(new Jugador("ACC-FANTASMA", "", "")));
-                System.out.println("==================================================");
-            }
+            case 1 -> controlador.ejecutarHito1();
+            case 2 -> controlador.ejecutarHito2("ITM-701");
+            case 3 -> controlador.ejecutarHito3();
             case 4 -> {
-                System.out.println("\n--- EJECUCIÓN: HITO 4 (SISTEMA DE COMERCIO SEGURO) ---");
                 System.out.print("Ingrese el ID de la cuenta para revertir su última transacción (ej: ACC-77): ");
                 String idBuscado = scanner.nextLine().trim();
-
-                boolean exito = sistemaComercio.revertirUltimaTransaccion(idBuscado);
-                if (exito) {
-                    System.out.println("[SISTEMA] Flujo completado de forma segura y exitosa.");
-                } else {
-                    System.out.println("[SISTEMA] Protocolo Comercio Seguro abortado / Falla de condiciones.");
-                }
+                controlador.ejecutarHito4(idBuscado);
             }
             case 5 -> historialMenus.desapilar();
             default -> System.out.println("[ERROR] Opción inválida. Intente nuevamente.");
         }
     }
 
-    // --- NUEVO MENÚ: CONSULTAS DE DATOS ---
+    // --- MENÚ 3: PANEL DE INSPECCIÓN DE TDAs ---
     private static void showConsultasDatosMenu() {
         System.out.println("\n--- PANEL DE INSPECCIÓN DE TDAs ---");
         System.out.println("1. Ver todos los jugadores (En orden) [AVL]");
@@ -536,125 +245,28 @@ public class Main {
 
         int opcion = leerOpcion();
         switch (opcion) {
-            case 1 -> {
-                System.out.println("\n--- LISTA DE JUGADORES REGISTRADOS (ÁRBOL AVL) ---");
-                Cola<Cuenta> cuentas = indiceCuentas.obtenerInorden();
-                if (cuentas.estaVacia()) {
-                    System.out.println("No hay jugadores registrados.");
-                } else {
-                    while (!cuentas.estaVacia()) {
-                        Cuenta c = cuentas.desencolar();
-                        System.out.println("- ID: " + c.getJugador().getIdCuenta() +
-                                " | Personaje: " + c.getJugador().getNombre() +
-                                " | Nivel: " + c.getJugador().getNivel() +
-                                " | Piso: " + c.getJugador().getPisoActual());
-                    }
-                }
-            }
-            case 2 -> {
-                System.out.println("\n--- CATÁLOGO GLOBAL DE ÍTEMS (ÁRBOL ABB) ---");
-                Cola<Item> itemsCatalogo = baseGlobalItems.obtenerInorden();
-                if (itemsCatalogo.estaVacia()) {
-                    System.out.println("El catálogo está vacío.");
-                } else {
-                    while (!itemsCatalogo.estaVacia()) {
-                        Item item = itemsCatalogo.desencolar();
-                        System.out.println("- " + item.toString());
-                    }
-                }
-            }
-            case 3 -> {
-                System.out.println("\n--- RECORRIDO EN ANCHURA DEL MUNDO ---");
-                System.out.println("Iniciando exploración síncrona desde el nodo raíz...");
-                // Invocamos el metodo BFS nativo de Gianluca pasándole el punto de partida demo
-                mapaGlobal.bfs("Pueblo de los Inicios");
-                System.out.println("\n[GRAFO] Recorrido de adyacencias completado.");
-            }
+            case 1 -> controlador.mostrarJugadoresAVL();
+            case 2 -> controlador.mostrarItemsABB();
+            case 3 -> controlador.mostrarConectividadGrafo();
             case 4 -> {
-                System.out.println("\n--- CONSULTA DE REGISTROS MASIVOS (ÁRBOL B) ---");
                 System.out.print("Ingrese el ID numérico de la transacción a buscar (Pruebe con 90001 o 90002): ");
                 try {
                     String input = scanner.nextLine().trim();
                     long idTransaccion = Long.parseLong(input);
-
-                    // Buscamos directamente en el Árbol B de Axel configurado con t=2
-                    Transaccion tx = historialSubastas.buscar(idTransaccion);
-
-                    if (tx != null) {
-                        System.out.println("\n==================================================");
-                        System.out.println("TRANSACCIÓN ENCONTRADA EN ÁRBOL B");
-                        System.out.println("==================================================");
-                        System.out.println("ID Transacción : " + tx.getId());
-                        System.out.println("ID del Ítem    : " + tx.getItem());
-                        System.out.println("Precio Oro     : " + tx.getPrecioFinal() + "g");
-                        System.out.println("Timestamp      : " + tx.getFechaFormateada());
-                        System.out.println("==================================================");
-                    } else {
-                        System.out.println("[ÁRBOL B] No se encontró ninguna transacción con ese ID.");
-                    }
+                    controlador.buscarTransaccionArbolB(idTransaccion);
                 } catch (NumberFormatException e) {
                     System.out.println("[ERROR] El ID de transacción debe ser un número entero largo (Long).");
                 }
             }
-            case 5 -> {
-                System.out.println("\n--- ÁRBOL DE PROGRESIÓN DE CLASES Y HABILIDADES (PREORDEN) ---");
-                System.out.println("Visualización jerárquica de la rama de talentos:");
-                arbolHabilidadesGlobal.preorden();
-                System.out.println("\n[ÁRBOL GENÉRICO] Exploración estructural finalizada.");
-            }
-            case 6 -> {
-                System.out.println("\n--- ÁRBOL DE PROGRESIÓN DE CLASES Y HABILIDADES (POSTORDEN) ---");
-                System.out.println("Orden de ejecución / cálculo de dependencias de habilidades:");
-                arbolHabilidadesGlobal.postorden();
-                System.out.println("\n[ÁRBOL GENÉRICO] Exploración de dependencias finalizada.");
-            }
+            case 5 -> controlador.mostrarHabilidadesPreorden();
+            case 6 -> controlador.mostrarHabilidadesPostorden();
             case 7 -> {
-                System.out.println("\n--- AUDITORÍA DE CARGA DEL SERVIDOR ---");
-                int total = gestorMisiones.getCantidadMisionesPendientes();
+                int total = controlador.getCantidadMisionesPendientes();
                 System.out.println("[COLA PRIORIDAD] Misiones actualmente activas en memoria: " + total);
             }
             case 8 -> historialMenus.desapilar();
             default -> System.out.println("[ERROR] Opción inválida. Intente nuevamente.");
         }
-    }
-
-    /**
-     * Motor de sincronización automática. Escanea el árbol n-ario nativo de habilidades,
-     * detecta la rama de la clase del jugador y desbloquea los poderes según su nivel actual.
-     */
-    private static void sincronizarHabilidadesAutomatica(Jugador jugador) {
-        if (arbolHabilidadesGlobal.estaVacio()) {
-            return;
-        }
-        // Iniciamos el recorrido recursivo desde la raíz del árbol general
-        procesarDesbloqueoRecursivo(arbolHabilidadesGlobal.getRaiz(), jugador, false);
-    }
-
-    private static void procesarDesbloqueoRecursivo(ArbolGenerico.NodoArbol<ClaseHabilidad> nodo, Jugador jugador, boolean ramaDeClaseActiva) {
-        if (nodo == null) {
-            return;
-        }
-
-        ClaseHabilidad infoHabilidad = nodo.getDato();
-        boolean banderaHijos = ramaDeClaseActiva;
-
-        // Si el nodo actual es de tipo CLASE y se llama igual a la del jugador, activamos la bandera para su descendencia
-        if (infoHabilidad.getTipo().equals("CLASE") && infoHabilidad.getNombre().equalsIgnoreCase(jugador.getClase())) {
-            banderaHijos = true;
-        }
-
-        // Si la bandera está activa y es una HABILIDAD, verificamos el requisito de nivel del simulador
-        if (banderaHijos && infoHabilidad.getTipo().equals("HABILIDAD")) {
-            if (jugador.getNivel() >= infoHabilidad.getNivelRequerido()) {
-                jugador.getHabilidadesAprendidas().agregar(infoHabilidad.getNombre());
-            }
-        }
-
-        // 1. Exploración en profundidad: bajamos al primer hijo directo heredando el estado de la bandera
-        procesarDesbloqueoRecursivo(nodo.getPrimerHijo(), jugador, banderaHijos);
-
-        // 2. Exploración lateral: avanzamos al hermano contiguo (mantiene el estado original recibido por el padre)
-        procesarDesbloqueoRecursivo(nodo.getSiguienteHermano(), jugador, ramaDeClaseActiva);
     }
 
     // --- METODO DE VALIDACIÓN DE ENTRADA ---
