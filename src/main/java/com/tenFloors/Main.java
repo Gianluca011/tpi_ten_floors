@@ -50,6 +50,7 @@ public class Main {
                 case "PRINCIPAL" -> showMainMenu();
                 case "GESTION_DATOS" -> showGestionDatosMenu();
                 case "CONSULTAS_COMPLEJAS" -> showConsultasComplejasMenu();
+                case "CONSULTAS_DATOS" -> showConsultasDatosMenu();
                 default -> {
                     System.out.println("[ERROR] Estado de navegación inválido. Reestableciendo...");
                     historialMenus.apilar("PRINCIPAL");
@@ -147,13 +148,15 @@ public class Main {
     }
 
     // --- SUBMENÚ 1: GESTIÓN DE DATOS ---
+    // --- SUBMENÚ 1: GESTIÓN DE DATOS ---
     private static void showGestionDatosMenu() {
         System.out.println("\n--- GESTIÓN DE DATOS (ADMIN) ---");
         System.out.println("1. Dar de Alta Cuenta (Árbol AVL Global)");
         System.out.println("2. Dar de Baja Cuenta (Árbol AVL Global)");
         System.out.println("3. Agregar Ítem a Mochila de Jugador (ABB)");
         System.out.println("4. Ver Estado e Inspección de Cuenta (AVL + ABB + Pila)");
-        System.out.println("5. <- Volver al Menú Principal");
+        System.out.println("5. Consultas (Ver todos los jugadores o ítems)"); // NUEVA OPCIÓN
+        System.out.println("6. <- Volver al Menú Principal"); // AHORA ES LA OPCIÓN 6
         System.out.print("Seleccione una opción: ");
 
         int opcion = leerOpcion();
@@ -225,7 +228,8 @@ public class Main {
                     System.out.println("[ERROR] No se encontró ninguna cuenta asociada a ese ID.");
                 }
             }
-            case 5 -> historialMenus.desapilar();
+            case 5 -> historialMenus.apilar("CONSULTAS_DATOS"); // REDIRIGE AL NUEVO MENÚ
+            case 6 -> historialMenus.desapilar();
             default -> System.out.println("[ERROR] Opción inválida. Intente nuevamente.");
         }
     }
@@ -303,6 +307,46 @@ public class Main {
                 }
             }
             case 5 -> historialMenus.desapilar();
+            default -> System.out.println("[ERROR] Opción inválida. Intente nuevamente.");
+        }
+    }
+
+    // --- NUEVO MENÚ: CONSULTAS DE DATOS ---
+    private static void showConsultasDatosMenu() {
+        System.out.println("\n--- MENÚ DE CONSULTAS ---");
+        System.out.println("1. Ver todos los jugadores");
+        System.out.println("2. Ver todos los ítems");
+        System.out.println("3. <- Volver al menú anterior");
+        System.out.print("Seleccione una opción: ");
+
+        int opcion = leerOpcion();
+        switch (opcion) {
+            case 1 -> {
+                System.out.println("\n--- LISTA DE JUGADORES REGISTRADOS ---");
+                List<Cuenta> cuentas = indiceCuentas.obtenerInorden();
+                if (cuentas.isEmpty()) {
+                    System.out.println("No hay jugadores registrados.");
+                } else {
+                    for (Cuenta c : cuentas) {
+                        System.out.println("- ID: " + c.getJugador().getIdCuenta() +
+                                " | Personaje: " + c.getJugador().getNombre() +
+                                " | Nivel: " + c.getJugador().getNivel() +
+                                " | Piso: " + c.getJugador().getPisoActual());
+                    }
+                }
+            }
+            case 2 -> {
+                System.out.println("\n--- CATÁLOGO GLOBAL DE ÍTEMS ---");
+                List<Item> items = baseGlobalItems.obtenerInorden();
+                if (items.isEmpty()) {
+                    System.out.println("El catálogo está vacío.");
+                } else {
+                    for (Item item : items) {
+                        System.out.println("- " + item.toString());
+                    }
+                }
+            }
+            case 3 -> historialMenus.desapilar();
             default -> System.out.println("[ERROR] Opción inválida. Intente nuevamente.");
         }
     }
