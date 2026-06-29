@@ -82,7 +82,8 @@ ten-floors-mmorpg/
 │   │               │     ├── GestorInventario.java
 │   │               │     ├── GestorMapa.java
 │   │               │     ├── GestorMisiones.java
-│   │               │     └── GestorTransacciones.java
+│   │               │     ├── GestorTransacciones.java
+│   │               │     └── GestorHabilidades.java
 │   │               │
 │   │               ├── consulta/                 # HITOS GRUPALES (Las 4 Consultas Complejas requeridas)
 │   │               │     ├── SistemaAuditoriaGremios.java
