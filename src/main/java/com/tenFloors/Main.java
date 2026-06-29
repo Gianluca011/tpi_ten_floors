@@ -3,6 +3,7 @@ package main.java.com.tenFloors;
 import main.java.com.tenFloors.controlador.ControladorJuego;
 import main.java.com.tenFloors.model.*;
 import main.java.com.tenFloors.tda.cola.Cola;
+import main.java.com.tenFloors.tda.conjunto.Conjunto;
 import main.java.com.tenFloors.tda.pila.Pila;
 
 import java.util.Scanner;
@@ -12,12 +13,9 @@ public class Main {
     private static final Scanner scanner = new Scanner(System.in);
     private static final Pila<String> historialMenus = new Pila<>();
     private static boolean running = true;
-
-    // Instancia única del Controlador del Juego según patrón GRASP
     private static ControladorJuego controlador;
 
     public static void main(String[] args) {
-        // Inicializamos el controlador maestro
         controlador = new ControladorJuego();
 
         System.out.println("==================================================");
@@ -26,7 +24,6 @@ public class Main {
 
         historialMenus.apilar("PRINCIPAL");
 
-        // Bucle principal de ejecución de consola
         while (running && !historialMenus.estaVacia()) {
             String menuActual = historialMenus.verTope();
 
@@ -46,7 +43,6 @@ public class Main {
         scanner.close();
     }
 
-    // --- MENÚ PRINCIPAL ---
     private static void showMainMenu() {
         System.out.println("\n--- MENÚ PRINCIPAL ---");
         System.out.println("1. Gestión de Datos (Altas/Bajas/Mapeos)");
@@ -63,7 +59,6 @@ public class Main {
         }
     }
 
-    // --- SUBMENÚ 1: GESTIÓN DE DATOS ---
     private static void showGestionDatosMenu() {
         System.out.println("\n--- GESTIÓN DE DATOS (ADMIN) ---");
         System.out.println("1. Dar de Alta Cuenta (Árbol AVL Global)");
@@ -83,10 +78,14 @@ public class Main {
                 String id = scanner.nextLine().trim().toUpperCase();
                 System.out.print("Ingrese el nombre del personaje: ");
                 String nombre = scanner.nextLine().trim();
-                System.out.println("Ingrese la clase del presonaje (MAGO/ASESINO/ESPADACHIN): ");
+                System.out.print("Ingrese la clase del personaje (MAGO/ASESINO/ESPADACHIN): ");
                 String clase = scanner.nextLine().trim().toUpperCase();
                 if (!id.isEmpty() && !nombre.isEmpty()) {
-                    controlador.darAltaCuenta(id, nombre, clase);
+                    if (controlador.darAltaCuenta(id, nombre, clase)) {
+                        System.out.println("[AVL] Cuenta registrada e índice rebalanceado exitosamente.");
+                    } else {
+                        System.out.println("[ERROR] El ID de cuenta ya existe en el índice global.");
+                    }
                 } else {
                     System.out.println("[ERROR] Entradas vacías no permitidas.");
                 }
@@ -151,7 +150,7 @@ public class Main {
                         }
                     }
 
-                    System.out.println("\n-> Operaciones comerciales pendientes en Pila (Tamanio): " + c.getHistorialComercio().getTamanio());
+                    System.out.println("\n-> Operaciones comerciales pendientes en Pila (Tamaño): " + c.getHistorialComercio().getTamanio());
                     System.out.println("==================================================");
                 } else {
                     System.out.println("[ERROR] No se encontró ninguna cuenta asociada a ese ID.");
@@ -186,6 +185,7 @@ public class Main {
 
                 if (idM > 0 && !nomM.isEmpty() && !recompensaM.isEmpty()) {
                     controlador.registrarNuevaMision(idM, nomM, descM, tipoM, pisoM, recompensaM);
+                    System.out.println("[COLA PRIORIDAD] Misión integrada y reordenada en el pool global.");
                 } else {
                     System.out.println("[ERROR] Datos inválidos o recompensa vacía. Cancelando alta.");
                 }
@@ -198,7 +198,40 @@ public class Main {
                 }
                 System.out.print("Ingrese el ID de la cuenta del jugador que completó la hazaña (ej. ACC-77): ");
                 String idCuenta = scanner.nextLine().trim().toUpperCase();
-                controlador.procesarDespachoMision(idCuenta);
+
+                ControladorJuego.ResultadoDespacho res = controlador.procesarDespachoMision(idCuenta);
+
+                if (!res.exito) {
+                    if ("LA_CUENTA_NO_EXISTE".equals(res.motivoError)) {
+                        System.out.println("[ERROR] La cuenta especificada no existe en el índice AVL global.");
+                    } else if ("PISO_INSUFICIENTE".equals(res.motivoError)) {
+                        System.out.println("\n==================================================");
+                        System.out.println("PROCESANDO RECLAMO DE MISIÓN CRÍTICA");
+                        System.out.println("==================================================");
+                        System.out.println("Evaluando a : " + res.jugador.getNombre() + " (Piso Actual: " + res.jugador.getPisoActual() + ")");
+                        System.out.println("Misión       : " + res.mision.getNombre() + " [" + res.mision.getTipo() + "]");
+                        System.out.println("Requisito    : Piso " + res.mision.getPisoRequerido() + " de la torre.");
+                        System.out.println("\n[RECHAZADO] El jugador no cumple con el piso requerido para esta misión.");
+                        System.out.println("[SISTEMA] La misión se descarta por intento de fraude o nivel insuficiente.");
+                        System.out.println("==================================================");
+                    }
+                } else {
+                    System.out.println("\n==================================================");
+                    System.out.println("PROCESANDO RECLAMO DE MISIÓN CRÍTICA");
+                    System.out.println("==================================================");
+                    System.out.println("Evaluando a : " + res.jugador.getNombre() + " (Piso Actual: " + res.jugador.getPisoActual() + ")");
+                    System.out.println("Misión       : " + res.mision.getNombre() + " [" + res.mision.getTipo() + "]");
+                    System.out.println("Requisito    : Piso " + res.mision.getPisoRequerido() + " de la torre.");
+
+                    if (res.premioOtorgado != null) {
+                        System.out.println("¡RECOMPENSA OTORGADA! Se añadió '" + res.premioOtorgado.toString() + "' a su mochila [ABB].");
+                    } else {
+                        System.out.println("[ALERTA] El ítem de recompensa no existe en el catálogo maestro.");
+                    }
+                    System.out.println("¡SUBIDA DE NIVEL! El personaje progresó: Lvl " + res.nivelAnterior + " -> Lvl " + res.nivelNuevo);
+                    System.out.println("[SISTEMA] Árbol de habilidades re-evaluado para la clase: " + res.jugador.getClase());
+                    System.out.println("==================================================");
+                }
             }
             case 7 -> historialMenus.apilar("CONSULTAS_DATOS");
             case 8 -> historialMenus.desapilar();
@@ -206,7 +239,6 @@ public class Main {
         }
     }
 
-    // --- MENÚ 2: CONSULTAS COMPLEJAS ---
     private static void showConsultasComplejasMenu() {
         System.out.println("\n--- CONSULTAS COMPLEJAS (HITOS GRUPALES) ---");
         System.out.println("1. Hito 1: Viaje Rápido y Formación de Party");
@@ -218,20 +250,66 @@ public class Main {
 
         int opcion = leerOpcion();
         switch (opcion) {
-            case 1 -> controlador.ejecutarHito1();
-            case 2 -> controlador.ejecutarHito2("ITM-701");
-            case 3 -> controlador.ejecutarHito3();
+            case 1 -> {
+                System.out.println("\n--- EJECUCIÓN: HITO 1 (VIAJE RÁPIDO Y PARTY) ---");
+                Cola<Jugador> partyArmada = controlador.ejecutarHito1();
+                System.out.println("\n==================================================");
+                System.out.println("RESULTADO DE LA COLA DE PARTY (FIFO)");
+                System.out.println("==================================================");
+                if (partyArmada == null || partyArmada.estaVacia()) {
+                    System.out.println("Nadie se unió a la Party.");
+                } else {
+                    int posicion = 1;
+                    while (!partyArmada.estaVacia()) {
+                        Jugador j = partyArmada.desencolar();
+                        System.out.println("Slot " + posicion + ": " + j.getNombre() + " (Nivel " + j.getNivel() + ")");
+                        posicion++;
+                    }
+                }
+                System.out.println("==================================================");
+            }
+            case 2 -> {
+                System.out.println("\n--- EJECUCIÓN: HITO 2 (SOPORTE TÉCNICO VIP) ---");
+                boolean exitoSoporte = controlador.ejecutarHito2("ITM-701");
+                if (exitoSoporte) {
+                    System.out.println("[SISTEMA] Operación de Soporte VIP finalizada correctamente.");
+                } else {
+                    System.out.println("[SISTEMA] No se pudo procesar ningún ticket.");
+                }
+            }
+            case 3 -> {
+                System.out.println("\n--- EJECUCIÓN: HITO 3 (AUDITORÍA DE GREMIOS) ---");
+                Gremio g = controlador.getGremioDemo();
+                System.out.println("Datos Generales del " + g.toString());
+                System.out.println("Visualización estructural por Consola (Preorden del TDA):");
+                g.getEstructuraJerarquica().preorden();
+
+                Conjunto<Jugador> lideresAudita = controlador.ejecutarHito3();
+
+                System.out.println("\n==================================================");
+                System.out.println("RESULTADO DE CONSOLIDACIÓN EN CONJUNTO TEMPORAL");
+                System.out.println("==================================================");
+                System.out.println("Total de líderes únicos validados y almacenados: " + lideresAudita.getTamanio());
+                System.out.println("Verificación de Existencia de Claves:");
+                System.out.println("   ¿Se consolidó al GM (ACC-77)?: " + lideresAudita.contiene(new Jugador("ACC-77", "", "")));
+                System.out.println("   ¿Se consolidó al ID FANTASMA?: " + lideresAudita.contiene(new Jugador("ACC-FANTASMA", "", "")));
+                System.out.println("==================================================");
+            }
             case 4 -> {
                 System.out.print("Ingrese el ID de la cuenta para revertir su última transacción (ej: ACC-77): ");
                 String idBuscado = scanner.nextLine().trim();
-                controlador.ejecutarHito4(idBuscado);
+                System.out.println("\n--- EJECUCIÓN: HITO 4 (SISTEMA DE COMERCIO SEGURO) ---");
+                if (controlador.ejecutarHito4(idBuscado)) {
+                    System.out.println("[SISTEMA] Flujo completado de forma segura y exitosa.");
+                } else {
+                    System.out.println("[SISTEMA] Protocolo Comercio Seguro abortado / Falla de condiciones.");
+                }
             }
             case 5 -> historialMenus.desapilar();
             default -> System.out.println("[ERROR] Opción inválida. Intente nuevamente.");
         }
     }
 
-    // --- MENÚ 3: PANEL DE INSPECCIÓN DE TDAs ---
     private static void showConsultasDatosMenu() {
         System.out.println("\n--- PANEL DE INSPECCIÓN DE TDAs ---");
         System.out.println("1. Ver todos los jugadores (En orden) [AVL]");
@@ -246,21 +324,75 @@ public class Main {
 
         int opcion = leerOpcion();
         switch (opcion) {
-            case 1 -> controlador.mostrarJugadoresAVL();
-            case 2 -> controlador.mostrarItemsABB();
-            case 3 -> controlador.mostrarConectividadGrafo();
+            case 1 -> {
+                System.out.println("\n--- LISTA DE JUGADORES REGISTRADOS (ÁRBOL AVL) ---");
+                Cola<Cuenta> cuentas = controlador.obtenerCuentasInorden();
+                if (cuentas == null || cuentas.estaVacia()) {
+                    System.out.println("No hay jugadores registrados.");
+                } else {
+                    while (!cuentas.estaVacia()) {
+                        Cuenta c = cuentas.desencolar();
+                        System.out.println("- ID: " + c.getJugador().getIdCuenta() +
+                                " | Personaje: " + c.getJugador().getNombre() +
+                                " | Nivel: " + c.getJugador().getNivel() +
+                                " | Piso: " + c.getJugador().getPisoActual());
+                    }
+                }
+            }
+            case 2 -> {
+                System.out.println("\n--- CATÁLOGO GLOBAL DE ÍTEMS (ÁRBOL ABB) ---");
+                Cola<Item> itemsCatalogo = controlador.obtenerItemsInorden();
+                if (itemsCatalogo == null || itemsCatalogo.estaVacia()) {
+                    System.out.println("El catálogo está vacío.");
+                } else {
+                    while (!itemsCatalogo.estaVacia()) {
+                        Item item = itemsCatalogo.desencolar();
+                        System.out.println("- " + item.toString());
+                    }
+                }
+            }
+            case 3 -> {
+                System.out.println("\n--- RECORRIDO EN ANCHURA DEL MUNDO ---");
+                System.out.println("Iniciando exploración síncrona desde el nodo raíz...");
+                controlador.getMapaGlobal().bfs("Pueblo de los Inicios");
+                System.out.println("\n[GRAFO] Recorrido de adyacencias completado.");
+            }
             case 4 -> {
                 System.out.print("Ingrese el ID numérico de la transacción a buscar (Pruebe con 90001 o 90002): ");
                 try {
                     String input = scanner.nextLine().trim();
                     long idTransaccion = Long.parseLong(input);
-                    controlador.buscarTransaccionArbolB(idTransaccion);
+                    System.out.println("\n--- CONSULTA DE REGISTROS MASIVOS (ÁRBOL B) ---");
+                    Transaccion tx = controlador.buscarTransaccionArbolB(idTransaccion);
+
+                    if (tx != null) {
+                        System.out.println("\n==================================================");
+                        System.out.println("TRANSACCIÓN ENCONTRADA EN ÁRBOL B");
+                        System.out.println("==================================================");
+                        System.out.println("ID Transacción : " + tx.getId());
+                        System.out.println("ID del Ítem    : " + tx.getItem());
+                        System.out.println("Precio Oro     : " + tx.getPrecioFinal() + "g");
+                        System.out.println("Timestamp      : " + tx.getFechaFormateada());
+                        System.out.println("==================================================");
+                    } else {
+                        System.out.println("[ÁRBOL B] No se encontró ninguna transacción con ese ID.");
+                    }
                 } catch (NumberFormatException e) {
                     System.out.println("[ERROR] El ID de transacción debe ser un número entero largo (Long).");
                 }
             }
-            case 5 -> controlador.mostrarHabilidadesPreorden();
-            case 6 -> controlador.mostrarHabilidadesPostorden();
+            case 5 -> {
+                System.out.println("\n--- ÁRBOL DE PROGRESIÓN DE CLASES Y HABILIDADES (PREORDEN) ---");
+                System.out.println("Visualización jerárquica de la rama de talentos:");
+                controlador.getArbolHabilidadesGlobal().preorden();
+                System.out.println("\n[ÁRBOL GENÉRICO] Exploración estructural finalizada.");
+            }
+            case 6 -> {
+                System.out.println("\n--- ÁRBOL DE PROGRESIÓN DE CLASES Y HABILIDADES (POSTORDEN) ---");
+                System.out.println("Orden de ejecución / cálculo de dependencias de habilidades:");
+                controlador.getArbolHabilidadesGlobal().postorden();
+                System.out.println("\n[ÁRBOL GENÉRICO] Exploración de dependencias finalizada.");
+            }
             case 7 -> {
                 int total = controlador.getCantidadMisionesPendientes();
                 System.out.println("[COLA PRIORIDAD] Misiones actualmente activas en memoria: " + total);
@@ -270,7 +402,6 @@ public class Main {
         }
     }
 
-    // --- METODO DE VALIDACIÓN DE ENTRADA ---
     private static int leerOpcion() {
         try {
             String input = scanner.nextLine();
