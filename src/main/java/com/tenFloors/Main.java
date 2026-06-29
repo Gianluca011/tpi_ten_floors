@@ -11,7 +11,6 @@ import main.java.com.tenFloors.tda.pila.Pila;
 import main.java.com.tenFloors.tda.avl.ArbolAVL;
 import main.java.com.tenFloors.tda.abb.ArbolABB;
 
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -231,11 +230,12 @@ public class Main {
                     System.out.println("Ubicación Actual: Piso " + c.getJugador().getPisoActual());
 
                     System.out.println("\n-> Mochila del Jugador (Recorrido Inorden ABB):");
-                    List<Item> items = c.getInventario().obtenerInorden();
-                    if (items.isEmpty()) {
+                    Cola<Item> items = c.getInventario().obtenerInorden();
+                    if (items.estaVacia()) {
                         System.out.println("   [La mochila está vacía]");
                     } else {
-                        for (Item item : items) {
+                        while (!items.estaVacia()) {
+                            Item item = items.desencolar();
                             System.out.println("   * " + item.toString());
                         }
                     }
@@ -350,11 +350,12 @@ public class Main {
         switch (opcion) {
             case 1 -> {
                 System.out.println("\n--- LISTA DE JUGADORES REGISTRADOS ---");
-                List<Cuenta> cuentas = indiceCuentas.obtenerInorden();
-                if (cuentas.isEmpty()) {
+                Cola<Cuenta> cuentas = indiceCuentas.obtenerInorden(); // Ahora retorna Cola nativa
+                if (cuentas.estaVacia()) {
                     System.out.println("No hay jugadores registrados.");
                 } else {
-                    for (Cuenta c : cuentas) {
+                    while (!cuentas.estaVacia()) {
+                        Cuenta c = cuentas.desencolar();
                         System.out.println("- ID: " + c.getJugador().getIdCuenta() +
                                 " | Personaje: " + c.getJugador().getNombre() +
                                 " | Nivel: " + c.getJugador().getNivel() +
@@ -364,11 +365,12 @@ public class Main {
             }
             case 2 -> {
                 System.out.println("\n--- CATÁLOGO GLOBAL DE ÍTEMS ---");
-                List<Item> items = baseGlobalItems.obtenerInorden();
-                if (items.isEmpty()) {
+                Cola<Item> itemsCatalogo = baseGlobalItems.obtenerInorden();
+                if (itemsCatalogo.estaVacia()) {
                     System.out.println("El catálogo está vacío.");
                 } else {
-                    for (Item item : items) {
+                    while (!itemsCatalogo.estaVacia()) {
+                        Item item = itemsCatalogo.desencolar();
                         System.out.println("- " + item.toString());
                     }
                 }

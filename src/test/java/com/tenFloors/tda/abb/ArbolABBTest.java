@@ -2,9 +2,9 @@ package test.java.com.tenFloors.tda.abb;
 
 import main.java.com.tenFloors.model.Item;
 import main.java.com.tenFloors.tda.abb.ArbolABB;
+import main.java.com.tenFloors.tda.cola.Cola;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ArbolABBTest {
@@ -33,13 +33,20 @@ public class ArbolABBTest {
         mochila.insertar(pocion.getId(), pocion);
         mochila.insertar(escudo.getId(), escudo);
 
-        List<Item> resultado = mochila.obtenerInorden();
+        Cola<Item> resultado = mochila.obtenerInorden();
 
-        // Verificamos que el recorrido Inorden los ordene alfabéticamente por ID
-        assertEquals(3, resultado.size());
-        assertEquals("20", resultado.get(0).getId());
-        assertEquals("50", resultado.get(1).getId());
-        assertEquals("80", resultado.get(2).getId());
+        assertNotNull(resultado);
+        assertFalse(resultado.estaVacia());
+
+        assertEquals("20", resultado.desencolar().getId());
+        assertFalse(resultado.estaVacia());
+
+        assertEquals("50", resultado.desencolar().getId());
+        assertFalse(resultado.estaVacia());
+
+        assertEquals("80", resultado.desencolar().getId());
+
+        assertTrue(resultado.estaVacia());
     }
 
     @Test
