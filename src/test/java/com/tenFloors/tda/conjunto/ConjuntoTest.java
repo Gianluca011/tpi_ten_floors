@@ -21,8 +21,8 @@ public class ConjuntoTest {
     public void setUp() {
         // Inicializamos el TDA y un par de instancias de prueba antes de cada test
         conjuntoOnline = new Conjunto<>();
-        jugador1 = new Jugador("ACC-001", "Arthas");
-        jugador2 = new Jugador("ACC-002", "Sylvanas");
+        jugador1 = new Jugador("ACC-001", "Arthas", "TANQUE");
+        jugador2 = new Jugador("ACC-002", "Sylvanas", "ESPADACHIN");
     }
 
     @Test
@@ -41,7 +41,7 @@ public class ConjuntoTest {
         conjuntoOnline.agregar(jugador1);
 
         // Intentamos agregar una instancia distinta pero con el mismo ID de cuenta (Clon)
-        Jugador clonArthas = new Jugador("ACC-001", "Arthas_Impostor");
+        Jugador clonArthas = new Jugador("ACC-001", "Arthas_Impostor", "ASESINO");
 
         boolean seAgregoDuplicado = conjuntoOnline.agregar(clonArthas);
 
@@ -84,7 +84,7 @@ public class ConjuntoTest {
         // La capacidad inicial es 16 y el factor de carga es 0.75 (Límite: 12 elementos antes del Rehash)
         // Insertamos 20 jugadores de forma masiva para forzar al menos un ciclo completo de Rehash
         for (int i = 1; i <= 20; i++) {
-            Jugador j = new Jugador("ACC-ID-" + i, "PlayerName_" + i);
+            Jugador j = new Jugador("ACC-ID-" + i, "PlayerName_" + i, "Clase_" + i);
             boolean insertado = conjuntoOnline.agregar(j);
             assertTrue(insertado, "Cada jugador masivo individual debería insertarse de forma única.");
         }
@@ -92,7 +92,7 @@ public class ConjuntoTest {
         assertEquals(20, conjuntoOnline.getTamanio(), "La tabla debió redimensionarse y contener los 20 registros.");
 
         // Verificamos que el primer y el último elemento sigan siendo perfectamente accesibles en O(1)
-        assertTrue(conjuntoOnline.contiene(new Jugador("ACC-ID-1", "PlayerName_1")), "El primer registro debe persistir tras el rehash.");
-        assertTrue(conjuntoOnline.contiene(new Jugador("ACC-ID-20", "PlayerName_20")), "El último registro insertado debe validarse correctamente.");
+        assertTrue(conjuntoOnline.contiene(new Jugador("ACC-ID-1", "PlayerName_1", "ASESINO")), "El primer registro debe persistir tras el rehash.");
+        assertTrue(conjuntoOnline.contiene(new Jugador("ACC-ID-20", "PlayerName_20", "TANQUE")), "El último registro insertado debe validarse correctamente.");
     }
 }

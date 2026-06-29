@@ -31,6 +31,7 @@ public class Main {
     private static final ColaPrioridad<Ticket> colaTicketsVIP = new ColaPrioridad<>();
     private static final ArbolB<Transaccion> historialSubastas = new ArbolB<>(2); // Configurado con grado mínimo t = 2
     private static SistemaSoporteVIP sistemaSoporte;
+    private static final ArbolGenerico<ClaseHabilidad> arbolHabilidadesGlobal = new ArbolGenerico<>();
 
     public static void main(String[] args) {
         // Inicializamos el motor del hito técnico cruzando los índices requeridos
@@ -72,6 +73,59 @@ public class Main {
      */
     private static void inicializarDatosDemo() {
 
+        // --- CARGA DE DATOS PARA ÁRBOL DE HABILIDADES (ÁRBOL GENÉRICO) ---
+        // 1. Definimos la RAÍZ MAESTRA del servidor (Contenedor global)
+        ClaseHabilidad raizServidor = new ClaseHabilidad("RAIZ", "SISTEMA", 0);
+        arbolHabilidadesGlobal.agregarHijo(null, raizServidor);
+
+        // ==========================================
+        // RAMA 1: ESPADACHÍN
+        // ==========================================
+        ClaseHabilidad espadachin = new ClaseHabilidad("ESPADACHIN", "CLASE", 1);
+        arbolHabilidadesGlobal.agregarHijo(raizServidor, espadachin); // Hijo de la raíz maestro
+
+        ClaseHabilidad catActivasEspada = new ClaseHabilidad("Habilidades Activas", "CATEGORIA", 1);
+        ClaseHabilidad catPasivasEspada = new ClaseHabilidad("Habilidades Pasivas", "CATEGORIA", 1);
+        arbolHabilidadesGlobal.agregarHijo(espadachin, catActivasEspada);
+        arbolHabilidadesGlobal.agregarHijo(espadachin, catPasivasEspada);
+
+        arbolHabilidadesGlobal.agregarHijo(catActivasEspada, new ClaseHabilidad("Estocada Certera", "HABILIDAD", 10));
+        arbolHabilidadesGlobal.agregarHijo(catActivasEspada, new ClaseHabilidad("Torbellino de Espadas", "HABILIDAD", 30));
+        arbolHabilidadesGlobal.agregarHijo(catPasivasEspada, new ClaseHabilidad("Maestría en Espadas", "HABILIDAD", 5));
+
+        // ==========================================
+        // RAMA 2: MAGO (Demostración de Multi-clase)
+        // ==========================================
+        ClaseHabilidad mago = new ClaseHabilidad("MAGO", "CLASE", 1);
+        arbolHabilidadesGlobal.agregarHijo(raizServidor, mago); // Hermano de Espadachín, hijo de la raíz maestro
+
+        ClaseHabilidad catHechizos = new ClaseHabilidad("Hechizos de Destrucción", "CATEGORIA", 1);
+        arbolHabilidadesGlobal.agregarHijo(mago, catHechizos);
+
+        arbolHabilidadesGlobal.agregarHijo(catHechizos, new ClaseHabilidad("Bola de Fuego", "HABILIDAD", 5));
+        arbolHabilidadesGlobal.agregarHijo(catHechizos, new ClaseHabilidad("Ventisca Helada", "HABILIDAD", 20));
+        arbolHabilidadesGlobal.agregarHijo(catHechizos, new ClaseHabilidad("Impacto Trueno", "HABILIDAD", 40));
+
+        // ==========================================
+        // RAMA 3: ASESINO (Especialista en Críticos)
+        // ==========================================
+        ClaseHabilidad asesino = new ClaseHabilidad("ASESINO", "CLASE", 1);
+        arbolHabilidadesGlobal.agregarHijo(raizServidor, asesino); // Hermano de Espadachín y Mago, hijo de la raíz maestro
+
+        ClaseHabilidad catArtesAsesinato = new ClaseHabilidad("Artes del Asesinato", "CATEGORIA", 1);
+        ClaseHabilidad catTacticasSigilo = new ClaseHabilidad("Tácticas de Sigilo", "CATEGORIA", 1);
+        arbolHabilidadesGlobal.agregarHijo(asesino, catArtesAsesinato);
+        arbolHabilidadesGlobal.agregarHijo(asesino, catTacticasSigilo);
+
+        // Habilidades de Artes del Asesinato
+        arbolHabilidadesGlobal.agregarHijo(catArtesAsesinato, new ClaseHabilidad("Emboscada", "HABILIDAD", 5));
+        arbolHabilidadesGlobal.agregarHijo(catArtesAsesinato, new ClaseHabilidad("Hoja Envenenada", "HABILIDAD", 12));
+        arbolHabilidadesGlobal.agregarHijo(catArtesAsesinato, new ClaseHabilidad("Ejecución", "HABILIDAD", 45));
+
+        // Habilidades de Tácticas de Sigilo
+        arbolHabilidadesGlobal.agregarHijo(catTacticasSigilo, new ClaseHabilidad("Paso Sombrío", "HABILIDAD", 20));
+        arbolHabilidadesGlobal.agregarHijo(catTacticasSigilo, new ClaseHabilidad("Manto de Invisibilidad", "HABILIDAD", 35));
+
         // Para Hito 4
         // 1. Poblamos el catálogo del servidor (ABB) con ítems íntegros
         baseGlobalItems.insertar("ITM-701", new ItemJuego("ITM-701", "Espada del Inframundo", "Legendaria"));
@@ -79,7 +133,7 @@ public class Main {
         baseGlobalItems.insertar("ITM-703", new ItemJuego("ITM-703", "Escudo del Olimpo", "Épica"));
 
         // 2. Registramos una cuenta de prueba para Lautaro Salto (ID: ACC-77)
-        Jugador lauti = new Jugador("ACC-77", "Lauti_Salto");
+        Jugador lauti = new Jugador("ACC-77", "Lauti_Salto", "MAGO");
         lauti.setNivel(60);
         lauti.setPisoActual(10);
         Cuenta cuentaLauti = new Cuenta(lauti);
@@ -98,10 +152,10 @@ public class Main {
         gremioDemo = new Gremio("Los Conquistadores de Aincrad", "LCA");
 
         // Registramos cuentas de oficiales adicionales en el AVL global de Axel
-        Cuenta cuentaGian = new Cuenta(new Jugador("ACC-02", "Gian_Chia"));
-        cuentaGian.getJugador().setNivel(55);
-        Cuenta cuentaAxel = new Cuenta(new Jugador("ACC-03", "Axel_Menz"));
-        cuentaAxel.getJugador().setNivel(58);
+        Cuenta cuentaGian = new Cuenta(new Jugador("ACC-02", "Gian_Chia", "ESPADACHIN"));
+        cuentaGian.getJugador().setNivel(12);
+        Cuenta cuentaAxel = new Cuenta(new Jugador("ACC-03", "Axel_Menz", "ASESINO"));
+        cuentaAxel.getJugador().setNivel(32);
 
         indiceCuentas.insertar("ACC-02", cuentaGian);
         indiceCuentas.insertar("ACC-03", cuentaAxel);
@@ -144,6 +198,9 @@ public class Main {
         colaTicketsVIP.insertar(new Ticket(1001L, "ACC-02", 90001L, "Compré una espada pero se me desconectó el cliente y no la veo", 3), 3);
         // Ticket de Lautaro (Prioridad Crítica VIP = 9) -> Debe salir primero por máxima urgencia
         colaTicketsVIP.insertar(new Ticket(1002L, "ACC-77", 90002L, "Perdí mis fondos y el escudo del Olimpo falló al reclamarse", 9), 9);
+
+        sincronizarHabilidadesAutomatica(lauti);
+        sincronizarHabilidadesAutomatica(cuentaGian.getJugador());
     }
 
     // --- MENÚ PRINCIPAL ---
@@ -178,11 +235,14 @@ public class Main {
         switch (opcion) {
             case 1 -> {
                 System.out.print("Ingrese el ID único de cuenta (ej. ACC-12): ");
-                String id = scanner.nextLine().trim();
+                String id = scanner.nextLine().trim().toUpperCase();
                 System.out.print("Ingrese el nombre del personaje: ");
                 String nombre = scanner.nextLine().trim();
+                System.out.println("Ingrese la clase del presonaje (MAGO/ASESINO/ESPADACHIN): ");
+                String clase = scanner.nextLine().trim().toUpperCase();
                 if (!id.isEmpty() && !nombre.isEmpty()) {
-                    Cuenta nuevaCuenta = new Cuenta(new Jugador(id, nombre));
+                    Cuenta nuevaCuenta = new Cuenta(new Jugador(id, nombre, clase));
+                    sincronizarHabilidadesAutomatica(nuevaCuenta.getJugador());
                     indiceCuentas.insertar(id, nuevaCuenta);
                     System.out.println("[AVL] Cuenta registrada e índice rebalanceado exitosamente.");
                 } else {
@@ -238,6 +298,26 @@ public class Main {
                             System.out.println("   * " + item.toString());
                         }
                     }
+
+                    System.out.println("\n-> Habilidades Desbloqueadas Automáticamente [CONJUNTO]:");
+                    if (c.getJugador().getHabilidadesAprendidas().estaVacio()) {
+                        System.out.println("   [No cumple requisitos para ninguna habilidad de su clase]");
+                    } else {
+                        String[] habilidadesCatalogo = {
+                                // Espadachín
+                                "Estocada Certera", "Torbellino de Espadas", "Golpe de Escudo", "Maestría en Espadas", "Reflejos de Acero", "Coraza de Titán",
+                                // Mago
+                                "Bola de Fuego", "Ventisca Helada", "Impacto Trueno",
+                                // Asesino
+                                "Emboscada", "Hoja Envenenada", "Ejecución", "Paso Sombrío", "Manto de Invisibilidad"
+                        };
+                        for (String hab : habilidadesCatalogo) {
+                            if (c.getJugador().getHabilidadesAprendidas().contiene(hab)) {
+                                System.out.println("   ✓ " + hab);
+                            }
+                        }
+                    }
+
                     System.out.println("\n-> Operaciones comerciales pendientes en Pila (Tamanio): " + c.getHistorialComercio().getTamanio());
                     System.out.println("==================================================");
                 } else {
@@ -316,8 +396,8 @@ public class Main {
                 System.out.println("==================================================");
                 System.out.println("Total de líderes únicos validados y almacenados: " + lideresAudita.getTamanio());
                 System.out.println("Verificación de Existencia de Claves:");
-                System.out.println("   ¿Se consolidó al GM (ACC-77)?: " + lideresAudita.contiene(new Jugador("ACC-77", "")));
-                System.out.println("   ¿Se consolidó al ID FANTASMA?: " + lideresAudita.contiene(new Jugador("ACC-FANTASMA", "")));
+                System.out.println("   ¿Se consolidó al GM (ACC-77)?: " + lideresAudita.contiene(new Jugador("ACC-77", "", "")));
+                System.out.println("   ¿Se consolidó al ID FANTASMA?: " + lideresAudita.contiene(new Jugador("ACC-FANTASMA", "", "")));
                 System.out.println("==================================================");
             }
             case 4 -> {
@@ -344,7 +424,9 @@ public class Main {
         System.out.println("2. Ver catálogo global de ítems (En orden) [ABB]");
         System.out.println("3. Ver conectividad del mapa (Recorrido BFS) [GRAFO]");
         System.out.println("4. Buscar transacción en la Casa de Subastas [ÁRBOL B]");
-        System.out.println("5. <- Volver al menú anterior");
+        System.out.println("5. Ver Árbol de Habilidades (Estructurado - Preorden) [ÁRBOL GENÉRICO]");
+        System.out.println("6. Ver Árbol de Habilidades (Dependencias - Postorden) [ÁRBOL GENÉRICO]");
+        System.out.println("7. <- Volver al menú anterior");
         System.out.print("Seleccione una opción: ");
 
         int opcion = leerOpcion();
@@ -409,9 +491,60 @@ public class Main {
                     System.out.println("[ERROR] El ID de transacción debe ser un número entero largo (Long).");
                 }
             }
-            case 5 -> historialMenus.desapilar();
+            case 5 -> {
+                System.out.println("\n--- ÁRBOL DE PROGRESIÓN DE CLASES Y HABILIDADES (PREORDEN) ---");
+                System.out.println("Visualización jerárquica de la rama de talentos:");
+                arbolHabilidadesGlobal.preorden();
+                System.out.println("\n[ÁRBOL GENÉRICO] Exploración estructural finalizada.");
+            }
+            case 6 -> {
+                System.out.println("\n--- ÁRBOL DE PROGRESIÓN DE CLASES Y HABILIDADES (POSTORDEN) ---");
+                System.out.println("Orden de ejecución / cálculo de dependencias de habilidades:");
+                arbolHabilidadesGlobal.postorden();
+                System.out.println("\n[ÁRBOL GENÉRICO] Exploración de dependencias finalizada.");
+            }
+            case 7 -> historialMenus.desapilar();
             default -> System.out.println("[ERROR] Opción inválida. Intente nuevamente.");
         }
+    }
+
+    /**
+     * Motor de sincronización automática. Escanea el árbol n-ario nativo de habilidades,
+     * detecta la rama de la clase del jugador y desbloquea los poderes según su nivel actual.
+     */
+    private static void sincronizarHabilidadesAutomatica(Jugador jugador) {
+        if (arbolHabilidadesGlobal.estaVacio()) {
+            return;
+        }
+        // Iniciamos el recorrido recursivo desde la raíz del árbol general
+        procesarDesbloqueoRecursivo(arbolHabilidadesGlobal.getRaiz(), jugador, false);
+    }
+
+    private static void procesarDesbloqueoRecursivo(ArbolGenerico.NodoArbol<ClaseHabilidad> nodo, Jugador jugador, boolean ramaDeClaseActiva) {
+        if (nodo == null) {
+            return;
+        }
+
+        ClaseHabilidad infoHabilidad = nodo.getDato();
+        boolean banderaHijos = ramaDeClaseActiva;
+
+        // Si el nodo actual es de tipo CLASE y se llama igual a la del jugador, activamos la bandera para su descendencia
+        if (infoHabilidad.getTipo().equals("CLASE") && infoHabilidad.getNombre().equalsIgnoreCase(jugador.getClase())) {
+            banderaHijos = true;
+        }
+
+        // Si la bandera está activa y es una HABILIDAD, verificamos el requisito de nivel del simulador
+        if (banderaHijos && infoHabilidad.getTipo().equals("HABILIDAD")) {
+            if (jugador.getNivel() >= infoHabilidad.getNivelRequerido()) {
+                jugador.getHabilidadesAprendidas().agregar(infoHabilidad.getNombre());
+            }
+        }
+
+        // 1. Exploración en profundidad: bajamos al primer hijo directo heredando el estado de la bandera
+        procesarDesbloqueoRecursivo(nodo.getPrimerHijo(), jugador, banderaHijos);
+
+        // 2. Exploración lateral: avanzamos al hermano contiguo (mantiene el estado original recibido por el padre)
+        procesarDesbloqueoRecursivo(nodo.getSiguienteHermano(), jugador, ramaDeClaseActiva);
     }
 
     // --- METODO DE VALIDACIÓN DE ENTRADA ---
