@@ -1,5 +1,10 @@
 package main.java.com.tenFloors.model;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 public class Transaccion {
     private final long id;
     private final String item;
@@ -17,6 +22,15 @@ public class Transaccion {
     public String getItem() { return item; }
     public double getPrecioFinal() { return precioFinal; }
     public long getTimestamp() { return timestamp; }
+
+    public String getFechaFormateada() {
+        LocalDateTime fecha = LocalDateTime.ofInstant(
+                Instant.ofEpochMilli(this.timestamp),
+                ZoneId.systemDefault()
+        );
+        DateTimeFormatter formateador = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        return fecha.format(formateador);
+    }
 
     @Override
     public String toString() {

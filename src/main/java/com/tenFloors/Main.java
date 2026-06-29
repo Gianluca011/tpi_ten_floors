@@ -164,7 +164,6 @@ public class Main {
     }
 
     // --- SUBMENÚ 1: GESTIÓN DE DATOS ---
-    // --- SUBMENÚ 1: GESTIÓN DE DATOS ---
     private static void showGestionDatosMenu() {
         System.out.println("\n--- GESTIÓN DE DATOS (ADMIN) ---");
         System.out.println("1. Dar de Alta Cuenta (Árbol AVL Global)");
@@ -172,7 +171,7 @@ public class Main {
         System.out.println("3. Agregar Ítem a Mochila de Jugador (ABB)");
         System.out.println("4. Ver Estado e Inspección de Cuenta (AVL + ABB + Pila)");
         System.out.println("5. Consultas (Ver todos los jugadores o ítems)"); // NUEVA OPCIÓN
-        System.out.println("6. <- Volver al Menú Principal"); // AHORA ES LA OPCIÓN 6
+        System.out.println("6. <- Volver al Menú Principal");
         System.out.print("Seleccione una opción: ");
 
         int opcion = leerOpcion();
@@ -340,17 +339,19 @@ public class Main {
 
     // --- NUEVO MENÚ: CONSULTAS DE DATOS ---
     private static void showConsultasDatosMenu() {
-        System.out.println("\n--- MENÚ DE CONSULTAS ---");
-        System.out.println("1. Ver todos los jugadores");
-        System.out.println("2. Ver todos los ítems");
-        System.out.println("3. <- Volver al menú anterior");
+        System.out.println("\n--- PANEL DE INSPECCIÓN DE TDAs ---");
+        System.out.println("1. Ver todos los jugadores (En orden) [AVL]");
+        System.out.println("2. Ver catálogo global de ítems (En orden) [ABB]");
+        System.out.println("3. Ver conectividad del mapa (Recorrido BFS) [GRAFO]");
+        System.out.println("4. Buscar transacción en la Casa de Subastas [ÁRBOL B]");
+        System.out.println("5. <- Volver al menú anterior");
         System.out.print("Seleccione una opción: ");
 
         int opcion = leerOpcion();
         switch (opcion) {
             case 1 -> {
-                System.out.println("\n--- LISTA DE JUGADORES REGISTRADOS ---");
-                Cola<Cuenta> cuentas = indiceCuentas.obtenerInorden(); // Ahora retorna Cola nativa
+                System.out.println("\n--- LISTA DE JUGADORES REGISTRADOS (ÁRBOL AVL) ---");
+                Cola<Cuenta> cuentas = indiceCuentas.obtenerInorden();
                 if (cuentas.estaVacia()) {
                     System.out.println("No hay jugadores registrados.");
                 } else {
@@ -364,7 +365,7 @@ public class Main {
                 }
             }
             case 2 -> {
-                System.out.println("\n--- CATÁLOGO GLOBAL DE ÍTEMS ---");
+                System.out.println("\n--- CATÁLOGO GLOBAL DE ÍTEMS (ÁRBOL ABB) ---");
                 Cola<Item> itemsCatalogo = baseGlobalItems.obtenerInorden();
                 if (itemsCatalogo.estaVacia()) {
                     System.out.println("El catálogo está vacío.");
@@ -375,7 +376,40 @@ public class Main {
                     }
                 }
             }
-            case 3 -> historialMenus.desapilar();
+            case 3 -> {
+                System.out.println("\n--- RECORRIDO EN ANCHURA DEL MUNDO ---");
+                System.out.println("Iniciando exploración síncrona desde el nodo raíz...");
+                // Invocamos el metodo BFS nativo de Gianluca pasándole el punto de partida demo
+                mapaGlobal.bfs("Pueblo de los Inicios");
+                System.out.println("\n[GRAFO] Recorrido de adyacencias completado.");
+            }
+            case 4 -> {
+                System.out.println("\n--- CONSULTA DE REGISTROS MASIVOS (ÁRBOL B) ---");
+                System.out.print("Ingrese el ID numérico de la transacción a buscar (Pruebe con 90001 o 90002): ");
+                try {
+                    String input = scanner.nextLine().trim();
+                    long idTransaccion = Long.parseLong(input);
+
+                    // Buscamos directamente en el Árbol B de Axel configurado con t=2
+                    Transaccion tx = historialSubastas.buscar(idTransaccion);
+
+                    if (tx != null) {
+                        System.out.println("\n==================================================");
+                        System.out.println("TRANSACCIÓN ENCONTRADA EN ÁRBOL B");
+                        System.out.println("==================================================");
+                        System.out.println("ID Transacción : " + tx.getId());
+                        System.out.println("ID del Ítem    : " + tx.getItem());
+                        System.out.println("Precio Oro     : " + tx.getPrecioFinal() + "g");
+                        System.out.println("Timestamp      : " + tx.getFechaFormateada());
+                        System.out.println("==================================================");
+                    } else {
+                        System.out.println("[ÁRBOL B] No se encontró ninguna transacción con ese ID.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("[ERROR] El ID de transacción debe ser un número entero largo (Long).");
+                }
+            }
+            case 5 -> historialMenus.desapilar();
             default -> System.out.println("[ERROR] Opción inválida. Intente nuevamente.");
         }
     }
