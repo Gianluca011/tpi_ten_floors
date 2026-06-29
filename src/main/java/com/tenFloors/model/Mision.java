@@ -27,13 +27,15 @@ public class Mision {
     private final String descripcion;
     private final TipoMision tipo;
     private final int pisoRequerido;
+    private final String idItemRecompensa;
 
-    public Mision(int id, String nombre, String descripcion, TipoMision tipo, int pisoRequerido) {
+    public Mision(int id, String nombre, String descripcion, TipoMision tipo, int pisoRequerido, String idItemRecompensa) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.tipo = tipo;
         this.pisoRequerido = pisoRequerido;
+        this.idItemRecompensa = idItemRecompensa;
     }
 
     public int getId() {
@@ -56,8 +58,10 @@ public class Mision {
         return pisoRequerido;
     }
 
+    public String getIdItemRecompensa() { return idItemRecompensa; }
+
     @Override
     public String toString() {
-        return "Misión [ID=" + id + "] " + nombre + " (" + tipo + ") - Piso: " + pisoRequerido;
+        return "Misión [ID=" + id + "] " + nombre + " (" + tipo + ") - Piso: " + pisoRequerido + " | Recompensa: " + idItemRecompensa;
     }
 }

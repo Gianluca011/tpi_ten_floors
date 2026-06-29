@@ -1,7 +1,9 @@
 package test.java.com.tenFloors.tda.colaPrioridad;
 
+import main.java.com.tenFloors.model.Item;
 import main.java.com.tenFloors.model.Mision;
 import main.java.com.tenFloors.model.Mision.TipoMision;
+import main.java.com.tenFloors.tda.abb.ArbolABB;
 import main.java.com.tenFloors.tda.colaPrioridad.ColaPrioridad;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ColaPrioridadTest {
 
     private ColaPrioridad<String> colaStrings;
+    private static final ArbolABB<Item> baseGlobalItems = new ArbolABB<>();
     private ColaPrioridad<Mision> colaMisiones;
 
     @BeforeEach
@@ -81,12 +84,13 @@ public class ColaPrioridadTest {
     }
 
     @Test
-    @DisplayName("Integración con Dominio: Validar prioridad estricta de Jefes de Mundo y Eventos")
+    @DisplayName("Integración con Dominio: Validar prioridad estricta de Jefes de Mundo y Eventos con sus Recompensas")
     public void testPrioridadMisionesDominio() {
-        Mision mEstandar1 = new Mision(1, "Matar 10 ratas", "Mochila llena", TipoMision.RECOLECCION_ESTANDAR, 1);
-        Mision mJefe = new Mision(2, "Ignis el Dragón", "Jefe de piso", TipoMision.JEFE_MUNDO, 10);
-        Mision mEvento = new Mision(3, "Invasión de Duendes", "Evento por tiempo", TipoMision.EVENTO_TEMPORAL, 3);
-        Mision mEstandar2 = new Mision(4, "Recolectar plantas", "Hierbas de curación", TipoMision.RECOLECCION_ESTANDAR, 2);
+        // Actualizados los constructores incorporando los IDs de ítems de recompensa simulados del catálogo
+        Mision mEstandar1 = new Mision(1, "Matar 10 ratas", "Mochila llena", TipoMision.RECOLECCION_ESTANDAR, 1, "ITM-702");
+        Mision mJefe = new Mision(2, "Ignis el Dragón", "Jefe de piso", TipoMision.JEFE_MUNDO, 10, "ITM-701");
+        Mision mEvento = new Mision(3, "Invasión de Duendes", "Evento por tiempo", TipoMision.EVENTO_TEMPORAL, 3, "ITM-703");
+        Mision mEstandar2 = new Mision(4, "Recolectar plantas", "Hierbas de curación", TipoMision.RECOLECCION_ESTANDAR, 2, "ITM-702");
 
         // Insertamos en un orden totalmente aleatorio
         colaMisiones.insertar(mEstandar1, mEstandar1.getTipo().getNivelPrioridad());
@@ -98,10 +102,12 @@ public class ColaPrioridadTest {
         Mision primeraPrio = colaMisiones.extraerMaximo();
         assertEquals(TipoMision.JEFE_MUNDO, primeraPrio.getTipo());
         assertEquals("Ignis el Dragón", primeraPrio.getNombre());
+        assertEquals("ITM-701", primeraPrio.getIdItemRecompensa(), "La recompensa del Jefe de Mundo debe ser la espada legendaria.");
 
         // El segundo extractMax() debe ser el Evento Temporal (Prioridad 2)
         Mision segundaPrio = colaMisiones.extraerMaximo();
         assertEquals(TipoMision.EVENTO_TEMPORAL, segundaPrio.getTipo());
+        assertEquals("ITM-703", segundaPrio.getIdItemRecompensa());
 
         // Las últimas deben ser las de recolección estándar (Prioridad 1)
         assertEquals(TipoMision.RECOLECCION_ESTANDAR, colaMisiones.extraerMaximo().getTipo());

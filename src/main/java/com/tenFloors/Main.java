@@ -22,6 +22,7 @@ public class Main {
     // Almacenamiento síncrono e Índices globales para la ejecución del ecosistema
     private static final ArbolAVL<Cuenta> indiceCuentas = new ArbolAVL<>();
     private static final ArbolABB<Item> baseGlobalItems = new ArbolABB<>();
+    private static final GestorMisiones gestorMisiones = new GestorMisiones();
     private static SistemaComercioSeguro sistemaComercio;
     private static final SistemaAuditoriaGremios sistemaAuditoria = new SistemaAuditoriaGremios();
     private static Gremio gremioDemo; // Definido de forma global para persistir en memoria síncrona
@@ -199,6 +200,11 @@ public class Main {
         // Ticket de Lautaro (Prioridad Crítica VIP = 9) -> Debe salir primero por máxima urgencia
         colaTicketsVIP.insertar(new Ticket(1002L, "ACC-77", 90002L, "Perdí mis fondos y el escudo del Olimpo falló al reclamarse", 9), 9);
 
+        gestorMisiones.registrarMision(new Mision(1, "Juntar 10 Hierbas Curativas", "Misión básica de recolección.", Mision.TipoMision.RECOLECCION_ESTANDAR, 1, "ITM-702"));
+        gestorMisiones.registrarMision(new Mision(2, "Matar al Dragón Ancestral", "Derrotar al jefe supremo de la torre.", Mision.TipoMision.JEFE_MUNDO, 10, "ITM-701"));
+        gestorMisiones.registrarMision(new Mision(3, "Festival de la Luna", "Evento temporal de recolección nocturna.", Mision.TipoMision.EVENTO_TEMPORAL, 3, "ITM-703"));
+        gestorMisiones.registrarMision(new Mision(4, "Invasión de Orcos", "Frenar la oleada antes de que destruyan el campamento.", Mision.TipoMision.EVENTO_TEMPORAL, 5, "ITM-702"));
+
         sincronizarHabilidadesAutomatica(lauti);
         sincronizarHabilidadesAutomatica(cuentaGian.getJugador());
     }
@@ -227,8 +233,10 @@ public class Main {
         System.out.println("2. Dar de Baja Cuenta (Árbol AVL Global)");
         System.out.println("3. Agregar Ítem a Mochila de Jugador (ABB)");
         System.out.println("4. Ver Estado e Inspección de Cuenta (AVL + ABB + Pila)");
-        System.out.println("5. Consultas (Ver todos los jugadores o ítems)"); // NUEVA OPCIÓN
-        System.out.println("6. <- Volver al Menú Principal");
+        System.out.println("5. Registrar Nueva Misión (Cola de Prioridad)");
+        System.out.println("6. Procesar Siguiente Misión Más Urgente (Despachar)");
+        System.out.println("7. Consultas (Panel de Inspección de TDAs)");
+        System.out.println("8. <- Volver al Menú Principal");
         System.out.print("Seleccione una opción: ");
 
         int opcion = leerOpcion();
@@ -324,8 +332,104 @@ public class Main {
                     System.out.println("[ERROR] No se encontró ninguna cuenta asociada a ese ID.");
                 }
             }
-            case 5 -> historialMenus.apilar("CONSULTAS_DATOS"); // REDIRIGE AL NUEVO MENÚ
-            case 6 -> historialMenus.desapilar();
+            case 5 -> {
+                System.out.println("\n--- REGISTRAR NUEVA MISIÓN ---");
+                System.out.print("Ingrese ID numérico de la misión: ");
+                int idM = leerOpcion();
+                System.out.print("Ingrese nombre de la misión: ");
+                String nomM = scanner.nextLine().trim();
+                System.out.print("Ingrese descripción detallada: ");
+                String descM = scanner.nextLine().trim();
+                System.out.println("Seleccione el Tipo de Misión:");
+                System.out.println("  1. RECOLECCION_ESTANDAR (Prioridad Baja)");
+                System.out.println("  2. EVENTO_TEMPORAL     (Prioridad Media)");
+                System.out.println("  3. JEFE_MUNDO          (Prioridad Crítica)");
+                System.out.print("Opción: ");
+                int tipoOpt = leerOpcion();
+
+                Mision.TipoMision tipoM = switch (tipoOpt) {
+                    case 2 -> Mision.TipoMision.EVENTO_TEMPORAL;
+                    case 3 -> Mision.TipoMision.JEFE_MUNDO;
+                    default -> Mision.TipoMision.RECOLECCION_ESTANDAR;
+                };
+
+                System.out.print("Ingrese el piso mínimo requerido de la torre: ");
+                int pisoM = leerOpcion();
+
+                System.out.print("Ingrese el ID del Ítem de recompensa (ej. ITM-701): ");
+                String recompensaM = scanner.nextLine().trim().toUpperCase();
+
+                if (idM > 0 && !nomM.isEmpty() && !recompensaM.isEmpty()) {
+                    gestorMisiones.registrarMision(new Mision(idM, nomM, descM, tipoM, pisoM, recompensaM));
+                    System.out.println("[COLA PRIORIDAD] Misión integrada y reordenada en el pool global.");
+                } else {
+                    System.out.println("[ERROR] Datos inválidos o recompensa vacía. Cancelando alta.");
+                }
+            }
+            case 6 -> {
+                System.out.println("\n--- SISTEMA DE DESPACHO Y COMPLETITUD DE MISIONES ---");
+
+                if (gestorMisiones.getCantidadMisionesPendientes() == 0) {
+                    System.out.println("[SISTEMA] No hay misiones activas pendientes en el registro.");
+                    break;
+                }
+
+                // 1. Solicitamos el jugador que reclama haber terminado la hazaña
+                System.out.print("Ingrese el ID de la cuenta del jugador que completó la hazaña (ej. ACC-77): ");
+                String idCuenta = scanner.nextLine().trim().toUpperCase();
+
+                Cuenta cuentaJugador = indiceCuentas.buscar(idCuenta);
+                if (cuentaJugador == null) {
+                    System.out.println("[ERROR] La cuenta especificada no existe en el índice AVL global.");
+                    break;
+                }
+
+                Jugador jugador = cuentaJugador.getJugador();
+
+                // 2. Extraemos de forma destructiva la misión con mayor prioridad del servidor
+                Mision misionUrgente = gestorMisiones.procesarSiguienteMision();
+
+                if (misionUrgente != null) {
+                    System.out.println("\n==================================================");
+                    System.out.println("PROCESANDO RECLAMO DE MISIÓN CRÍTICA");
+                    System.out.println("==================================================");
+                    System.out.println("Evaluando a : " + jugador.getNombre() + " (Piso Actual: " + jugador.getPisoActual() + ")");
+                    System.out.println("Misión       : " + misionUrgente.getNombre() + " [" + misionUrgente.getTipo() + "]");
+                    System.out.println("Requisito    : Piso " + misionUrgente.getPisoRequerido() + " de la torre.");
+
+                    // 3. Validación de Regla de Dominio: ¿El jugador está o estuvo en el piso requerido?
+                    if (jugador.getPisoActual() < misionUrgente.getPisoRequerido()) {
+                        System.out.println("\n[RECHAZADO] El jugador no cumple con el piso requerido para esta misión.");
+                        System.out.println("[SISTEMA] La misión se descarta por intento de fraude o nivel insuficiente.");
+                        System.out.println("==================================================");
+                        break;
+                    }
+
+                    // 4. Búsqueda e indexación de la recompensa cruzando los ABB
+                    String idPremio = misionUrgente.getIdItemRecompensa();
+                    Item premioCatalogo = baseGlobalItems.buscar(idPremio);
+
+                    if (premioCatalogo != null) {
+                        // Insertamos el ítem directamente en el ABB privado de la mochila del jugador
+                        cuentaJugador.getInventario().insertar(idPremio, premioCatalogo);
+                        System.out.println("¡RECOMPENSA OTORGADA! Se añadió '" + premioCatalogo.toString() + "' a su mochila [ABB].");
+                    } else {
+                        System.out.println("[ALERTA] El ítem de recompensa (" + idPremio + ") no existe en el catálogo maestro.");
+                    }
+
+                    // 5. Progreso del personaje: Le otorgamos un bonus de nivel por completar la misión
+                    int nivelViejo = jugador.getNivel();
+                    jugador.setNivel(nivelViejo + 2); // Sube 2 niveles de golpe
+                    System.out.println("¡SUBIDA DE NIVEL! El personaje progresó: Lvl " + nivelViejo + " -> Lvl " + jugador.getNivel());
+
+                    // 6. Sincronización del Árbol Genérico: Buscamos si desbloqueó nuevos poderes con su nuevo nivel
+                    sincronizarHabilidadesAutomatica(jugador);
+                    System.out.println("[SISTEMA] Árbol de habilidades re-evaluado para la clase: " + jugador.getClase());
+                    System.out.println("==================================================");
+                }
+            }
+            case 7 -> historialMenus.apilar("CONSULTAS_DATOS");
+            case 8 -> historialMenus.desapilar();
             default -> System.out.println("[ERROR] Opción inválida. Intente nuevamente.");
         }
     }
@@ -426,7 +530,8 @@ public class Main {
         System.out.println("4. Buscar transacción en la Casa de Subastas [ÁRBOL B]");
         System.out.println("5. Ver Árbol de Habilidades (Estructurado - Preorden) [ÁRBOL GENÉRICO]");
         System.out.println("6. Ver Árbol de Habilidades (Dependencias - Postorden) [ÁRBOL GENÉRICO]");
-        System.out.println("7. <- Volver al menú anterior");
+        System.out.println("7. Ver cantidad de misiones globales pendientes [COLA PRIORIDAD]");
+        System.out.println("8. <- Volver al menú anterior");
         System.out.print("Seleccione una opción: ");
 
         int opcion = leerOpcion();
@@ -503,7 +608,12 @@ public class Main {
                 arbolHabilidadesGlobal.postorden();
                 System.out.println("\n[ÁRBOL GENÉRICO] Exploración de dependencias finalizada.");
             }
-            case 7 -> historialMenus.desapilar();
+            case 7 -> {
+                System.out.println("\n--- AUDITORÍA DE CARGA DEL SERVIDOR ---");
+                int total = gestorMisiones.getCantidadMisionesPendientes();
+                System.out.println("[COLA PRIORIDAD] Misiones actualmente activas en memoria: " + total);
+            }
+            case 8 -> historialMenus.desapilar();
             default -> System.out.println("[ERROR] Opción inválida. Intente nuevamente.");
         }
     }
