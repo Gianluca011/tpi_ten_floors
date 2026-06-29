@@ -2,7 +2,7 @@ package main.java.com.tenFloors.model;
 
 import main.java.com.tenFloors.tda.colaPrioridad.ColaPrioridad;
 import main.java.com.tenFloors.tda.arbolB.ArbolB;
-import main.java.com.tenFloors.tda.avl.ArbolAVLCuentas;
+import main.java.com.tenFloors.tda.avl.ArbolAVL;
 import main.java.com.tenFloors.tda.abb.ArbolABB;
 
 /**
@@ -13,12 +13,12 @@ public class SistemaSoporteVIP {
 
     private final ColaPrioridad<Ticket> colaTickets;
     private final ArbolB<Transaccion> historialSubastas;
-    private final ArbolAVLCuentas<Cuenta> indiceCuentas;
+    private final ArbolAVL<Cuenta> indiceCuentas;
     private final ArbolABB<Item> baseGlobalItems;
 
     public SistemaSoporteVIP(ColaPrioridad<Ticket> colaTickets,
                              ArbolB<Transaccion> historialSubastas,
-                             ArbolAVLCuentas<Cuenta> indiceCuentas,
+                             ArbolAVL<Cuenta> indiceCuentas,
                              ArbolABB<Item> baseGlobalItems) {
         this.colaTickets = colaTickets;
         this.historialSubastas = historialSubastas;

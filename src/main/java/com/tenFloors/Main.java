@@ -8,7 +8,7 @@ import main.java.com.tenFloors.tda.colaPrioridad.ColaPrioridad;
 import main.java.com.tenFloors.tda.conjunto.Conjunto;
 import main.java.com.tenFloors.tda.grafo.Grafo;
 import main.java.com.tenFloors.tda.pila.Pila;
-import main.java.com.tenFloors.tda.avl.ArbolAVLCuentas;
+import main.java.com.tenFloors.tda.avl.ArbolAVL;
 import main.java.com.tenFloors.tda.abb.ArbolABB;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class Main {
     private static boolean running = true;
 
     // Almacenamiento síncrono e Índices globales para la ejecución del ecosistema
-    private static final ArbolAVLCuentas<Cuenta> indiceCuentas = new ArbolAVLCuentas<>();
+    private static final ArbolAVL<Cuenta> indiceCuentas = new ArbolAVL<>();
     private static final ArbolABB<Item> baseGlobalItems = new ArbolABB<>();
     private static SistemaComercioSeguro sistemaComercio;
     private static final SistemaAuditoriaGremios sistemaAuditoria = new SistemaAuditoriaGremios();

@@ -1,6 +1,6 @@
 package main.java.com.tenFloors.model;
 
-import main.java.com.tenFloors.tda.avl.ArbolAVLCuentas;
+import main.java.com.tenFloors.tda.avl.ArbolAVL;
 
 /**
  * GESTOR DE NEGOCIO GLOBAL: Administra todas las cuentas del servidor.
@@ -9,10 +9,10 @@ import main.java.com.tenFloors.tda.avl.ArbolAVLCuentas;
 public class GestorCuentas {
 
     // El motor AVL. Configurado estrictamente para guardar objetos de tipo <Jugador>.
-    private final ArbolAVLCuentas<Jugador> indiceGlobalCuentas;
+    private final ArbolAVL<Jugador> indiceGlobalCuentas;
 
     public GestorCuentas() {
-        this.indiceGlobalCuentas = new ArbolAVLCuentas<>();
+        this.indiceGlobalCuentas = new ArbolAVL<>();
     }
 
     // --- ALTA DE CUENTAS ---

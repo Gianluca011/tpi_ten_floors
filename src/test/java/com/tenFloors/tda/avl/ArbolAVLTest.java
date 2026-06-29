@@ -1,13 +1,13 @@
 package test.java.com.tenFloors.tda.avl;
 
-import main.java.com.tenFloors.tda.avl.ArbolAVLCuentas;
+import main.java.com.tenFloors.tda.avl.ArbolAVL;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ArbolAVLCuentasTest {
+public class ArbolAVLTest {
 
-    private ArbolAVLCuentas<CuentaMock> arbol;
+    private ArbolAVL<CuentaMock> arbol;
 
     // Clase interna limpia: ya no implementa IIdentificable y usa String ID
     private static class CuentaMock {
@@ -18,7 +18,7 @@ public class ArbolAVLCuentasTest {
 
     @BeforeEach
     public void setUp() {
-        arbol = new ArbolAVLCuentas<>();
+        arbol = new ArbolAVL<>();
     }
 
     @Test

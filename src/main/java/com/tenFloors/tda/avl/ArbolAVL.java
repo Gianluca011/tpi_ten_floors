@@ -1,9 +1,9 @@
 package main.java.com.tenFloors.tda.avl;
 
-public class ArbolAVLCuentas<T> {
+public class ArbolAVL<T> {
     private NodoAVL<T> raiz;
 
-    public ArbolAVLCuentas() { this.raiz = null; }
+    public ArbolAVL() { this.raiz = null; }
 
     public int mostrarAltura() { return altura(raiz); }
 
