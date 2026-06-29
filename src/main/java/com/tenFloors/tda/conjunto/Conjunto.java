@@ -9,38 +9,57 @@ import main.java.com.tenFloors.tda.cola.Cola;
  * @param <T> Tipo de elemento a almacenar (ej. Jugador o String para IDs de cuenta).
  */
 public class Conjunto<T> {
-    // Nodo interno para el manejo de colisiones
-    private static class Nodo<T> {
-        private final T elemento;
-        private Nodo<T> siguiente;
 
+    /**
+     * Clase interna que representa un nodo de la tabla hash
+     * para manejar colisiones mediante encadenamiento (Linked List).
+     * @param <T>
+     */
+    private static class Nodo<T> {
+        private final T elemento; // Dato almacenado en el nodo, final para que no pueda ser modificado después de la creación
+        private Nodo<T> siguiente; // Referencia al siguiente nodo en la lista enlazada del balde
+
+        /**
+         * Constructor de la clase Nodo.
+         * @param elemento
+         */
         public Nodo(T elemento) {
             this.elemento = elemento;
             this.siguiente = null;
         }
     }
 
+    // Arreglo de nodos que representa la tabla hash, donde cada índice es un balde que puede contener una lista enlazada de nodos para manejar colisiones
     private Nodo<T>[] tabla;
-    private int tamanio;
+    private int tamanio; // Contador de elementos en el conjunto
 
     // Configuración para el redimensionamiento dinámico de la tabla
-    private static final int CAPACIDAD_INICIAL = 16;
-    private static final double FACTOR_CARGA_MAXIMO = 0.75;
+    private static final int CAPACIDAD_INICIAL = 16; // Tamaño inicial de la tabla hash
+    private static final double FACTOR_CARGA_MAXIMO = 0.75; // Factor de carga máximo antes de redimensionar la tabla hash
 
+    /**
+     * Constructor de la clase Conjunto.
+     * Inicializa la tabla hash con la capacidad inicial y establece el tamaño en 0.
+     */
     @SuppressWarnings("unchecked")
     public Conjunto() {
-        this.tabla = (Nodo<T>[]) new Nodo[CAPACIDAD_INICIAL];
+        this.tabla = (Nodo<T>[]) new Nodo[CAPACIDAD_INICIAL]; // Inicializa la tabla hash con la capacidad inicial
         this.tamanio = 0;
     }
 
     /**
      * Calcula el índice de la tabla aplicando la función Hash nativa del objeto
      * y mitigando valores de dispersión negativos.
+     * @param elemento Elemento a calcular su índice en la tabla hash
+     * @return Índice calculado para el elemento en la tabla hash
      */
     private int calcularIndice(T elemento) {
+        // Si el elemento es nulo, se asigna al índice 0 para evitar excepciones
         if (elemento == null) {
             return 0;
         }
+        // Se utiliza Math.abs para asegurar que el índice sea positivo
+        // y se aplica el módulo con la longitud de la tabla para obtener un índice válido
         return Math.abs(elemento.hashCode()) % this.tabla.length;
     }
 
@@ -52,6 +71,7 @@ public class Conjunto<T> {
      * @return true si el jugador se conectó exitosamente; false si ya estaba online.
      */
     public boolean agregar(T elemento) {
+        // Validación de entrada: no se permiten elementos nulos en el conjunto
         if (elemento == null) {
             throw new IllegalArgumentException("No se pueden agregar elementos nulos al conjunto.");
         }
@@ -66,8 +86,8 @@ public class Conjunto<T> {
             rehash();
         }
 
-        int indice = calcularIndice(elemento);
-        Nodo<T> nuevoNodo = new Nodo<>(elemento);
+        int indice = calcularIndice(elemento); // Calcula el índice del balde correspondiente para el elemento a insertar
+        Nodo<T> nuevoNodo = new Nodo<>(elemento); // Crea un nuevo nodo con el elemento a insertar
 
         // Inserción al inicio de la lista enlazada del balde (Bucket) correspondiente
         if (this.tabla[indice] != null) {
@@ -86,13 +106,18 @@ public class Conjunto<T> {
      * @return true si el elemento está presente (Online), false de lo contrario.
      */
     public boolean contiene(T elemento) {
+        // Validación de entrada: si el elemento es nulo, no puede estar presente en el conjunto
         if (elemento == null) {
             return false;
         }
 
+        // Calcula el índice del balde correspondiente para el elemento a buscar
         int indice = calcularIndice(elemento);
+
+        
         Nodo<T> actual = this.tabla[indice];
 
+        // Mientras haya nodos en la lista enlazada, compara cada elemento con el buscado
         while (actual != null) {
             if (actual.elemento.equals(elemento)) {
                 return true;
