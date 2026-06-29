@@ -246,6 +246,35 @@ public class ControladorJuego {
         return sistemaComercio.revertirUltimaTransaccion(idBuscado);
     }
 
+    /**
+     * Recupera de forma segura las habilidades aprendidas por un jugador,
+     * exportadas en una estructura lineal (Cola).
+     *
+     * @param idCuenta ID único de la cuenta a consultar.
+     * @return Una Cola con los nombres de las habilidades, o una cola vacía si no existe la cuenta.
+     */
+    public Cola<String> obtenerHabilidadesJugador(String idCuenta) {
+        Cuenta c = this.indiceCuentas.buscar(idCuenta);
+        if (c == null) {
+            return new Cola<>(); // Retornamos una cola vacía para evitar NullPointerException en la vista
+        }
+        return c.getJugador().getHabilidadesAprendidas().obtenerElementos();
+    }
+
+    /**
+     * Recupera los ítems de la mochila de un jugador en orden secuencial (Inorden).
+     *
+     * @param idCuenta ID único de la cuenta a consultar.
+     * @return Una Cola con los ítems del inventario, o una cola vacía si no existe la cuenta.
+     */
+    public Cola<Item> obtenerMochilaJugador(String idCuenta) {
+        Cuenta c = this.indiceCuentas.buscar(idCuenta);
+        if (c == null) {
+            return new Cola<>();
+        }
+        return c.getInventario().obtenerInorden();
+    }
+
     public Cola<Cuenta> obtenerCuentasInorden() {
         return indiceCuentas.obtenerInorden(); // Nota: Cambiar a obtainInorden o el nombre exacto de tu AVL
     }

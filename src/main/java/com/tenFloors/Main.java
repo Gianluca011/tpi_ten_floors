@@ -1,32 +1,36 @@
 package main.java.com.tenFloors;
 
+// Importacion de clases y paquetes necesarios, los TDAs
 import main.java.com.tenFloors.controlador.ControladorJuego;
 import main.java.com.tenFloors.model.*;
 import main.java.com.tenFloors.tda.cola.Cola;
 import main.java.com.tenFloors.tda.conjunto.Conjunto;
 import main.java.com.tenFloors.tda.pila.Pila;
 
+// Importacion de Scanner para la lectura de entradas por consola
 import java.util.Scanner;
 
 public class Main {
 
-    private static final Scanner scanner = new Scanner(System.in);
-    private static final Pila<String> historialMenus = new Pila<>();
-    private static boolean running = true;
-    private static ControladorJuego controlador;
+    private static final Scanner scanner = new Scanner(System.in); // Scanner para leer entradas de consola
+    private static final Pila<String> historialMenus = new Pila<>(); // Pila para mantener el historial de menús
+    private static boolean running = true; // Flag para controlar la ejecución del programa
+    private static ControladorJuego controlador; // Instancia del controlador del juego
 
     public static void main(String[] args) {
-        controlador = new ControladorJuego();
+        controlador = new ControladorJuego(); // Inicialización del controlador del juego
 
         System.out.println("==================================================");
         System.out.println("             BIENVENIDO A TEN FLOORS             ");
         System.out.println("==================================================");
 
-        historialMenus.apilar("PRINCIPAL");
+        historialMenus.apilar("PRINCIPAL"); // Apilamos el menú principal como el primer estado de navegación
 
-        while (running && !historialMenus.estaVacia()) {
+        while (running && !historialMenus.estaVacia()) { // Mientras el programa esté corriendo y haya menús en el historial
+            // Obtenemos el menú actual desde la cima de la pila
             String menuActual = historialMenus.verTope();
 
+            // Dependiendo del menú actual, mostramos el menú correspondiente
             switch (menuActual) {
                 case "PRINCIPAL" -> showMainMenu();
                 case "GESTION_DATOS" -> showGestionDatosMenu();
@@ -39,10 +43,14 @@ public class Main {
             }
         }
 
+        // Saludo de cierre del programa 
         System.out.println("\n[SISTEMA] Servidor cerrado correctamente.");
         scanner.close();
     }
 
+    /**
+     * Muestra el menú principal del sistema.
+     */
     private static void showMainMenu() {
         System.out.println("\n--- MENÚ PRINCIPAL ---");
         System.out.println("1. Gestión de Datos (Altas/Bajas/Mapeos)");
@@ -50,15 +58,19 @@ public class Main {
         System.out.println("3. Salir de Ten Floors");
         System.out.print("Seleccione una opción: ");
 
-        int opcion = leerOpcion();
+        int opcion = leerOpcion(); // Leemos la opción ingresada por el usuario
         switch (opcion) {
             case 1 -> historialMenus.apilar("GESTION_DATOS");
             case 2 -> historialMenus.apilar("CONSULTAS_COMPLEJAS");
-            case 3 -> running = false;
+            case 3 -> running = false; // Cambiamos el flag para salir del bucle principal
             default -> System.out.println("[ERROR] Opción inválida. Intente nuevamente.");
         }
     }
 
+    /**
+     * Muestra el menú de gestión de datos.
+     * Aca se pueden realizar operaciones de alta, baja, inspección y registro de misiones.
+     */
     private static void showGestionDatosMenu() {
         System.out.println("\n--- GESTIÓN DE DATOS (ADMIN) ---");
         System.out.println("1. Dar de Alta Cuenta (Árbol AVL Global)");
@@ -71,17 +83,21 @@ public class Main {
         System.out.println("8. <- Volver al Menú Principal");
         System.out.print("Seleccione una opción: ");
 
-        int opcion = leerOpcion();
+        int opcion = leerOpcion(); // Leemos la opción ingresada por el usuario
+
+        // Dependiendo de la opción seleccionada, ejecutamos la acción correspondiente
         switch (opcion) {
             case 1 -> {
                 System.out.print("Ingrese el ID único de cuenta (ej. ACC-12): ");
-                String id = scanner.nextLine().trim().toUpperCase();
+                String id = scanner.nextLine().trim().toUpperCase(); // El ID siempre se maneja en mayúsculas para consistencia
                 System.out.print("Ingrese el nombre del personaje: ");
                 String nombre = scanner.nextLine().trim();
                 System.out.print("Ingrese la clase del personaje (MAGO/ASESINO/ESPADACHIN): ");
-                String clase = scanner.nextLine().trim().toUpperCase();
-                if (!id.isEmpty() && !nombre.isEmpty()) {
-                    if (controlador.darAltaCuenta(id, nombre, clase)) {
+                String clase = scanner.nextLine().trim().toUpperCase(); // La clase también se maneja en mayúsculas para consistencia
+
+                // Validamos que las entradas no estén vacías antes de intentar dar de alta la cuenta
+                if (!id.isEmpty() && !nombre.isEmpty() && !clase.isEmpty()) {
+                    if (controlador.darAltaCuenta(id, nombre, clase)) { // Si la cuenta se da de alta correctamente, se imprime un mensaje de éxito
                         System.out.println("[AVL] Cuenta registrada e índice rebalanceado exitosamente.");
                     } else {
                         System.out.println("[ERROR] El ID de cuenta ya existe en el índice global.");
@@ -92,20 +108,35 @@ public class Main {
             }
             case 2 -> {
                 System.out.print("Ingrese el ID de la cuenta a dar de baja: ");
-                String id = scanner.nextLine().trim();
-                if (controlador.darBajaCuenta(id)) {
-                    System.out.println("[AVL] Cuenta removida correctamente. Árbol auto-balanceado.");
+                String id = scanner.nextLine().trim().toUpperCase();
+
+                // Validamos que el ID no esté vacío antes de intentar dar de baja la cuenta
+                if (!id.isEmpty()) {
+                    if (controlador.darBajaCuenta(id)) {
+                        System.out.println("[AVL] Cuenta removida correctamente. Árbol auto-balanceado.");
+                    } else {
+                        System.out.println("[ERROR] La cuenta especificada no existe.");
+                    }
                 } else {
-                    System.out.println("[ERROR] La cuenta especificada no existe.");
+                    System.out.println("[ERROR] ID de cuenta vacío no permitido.");
                 }
             }
             case 3 -> {
                 System.out.print("Ingrese el ID de cuenta del jugador: ");
-                String idC = scanner.nextLine().trim();
+                String idC = scanner.nextLine().trim().toUpperCase();
                 System.out.print("Ingrese ID de ítem del catálogo (ITM-701, ITM-702, ITM-703): ");
-                String idI = scanner.nextLine().trim();
+                String idI = scanner.nextLine().trim().toUpperCase();
 
+                // Validamos que ambos IDs no estén vacíos antes de intentar agregar el ítem a la mochila
+                if (idC.isEmpty() || idI.isEmpty()) {
+                    System.out.println("[ERROR] ID de cuenta o ítem vacío no permitido.");
+                    break;
+                }
+
+                // Si la cuenta y el ítem son válidos, se intenta agregar el ítem a la mochila del jugador
                 int resultado = controlador.agregarItemMochila(idC, idI);
+
+                // Segun el resultado de la operación, se imprime un mensaje correspondiente
                 switch (resultado) {
                     case 0 -> System.out.println("[ABB] Ítem indexado en el inventario del jugador.");
                     case 1 -> System.out.println("[ERROR] Cuenta no encontrada.");
@@ -116,7 +147,8 @@ public class Main {
                 System.out.print("Ingrese ID de cuenta a inspeccionar (Pruebe con 'ACC-77'): ");
                 String id = scanner.nextLine().trim();
                 Cuenta c = controlador.buscarCuenta(id);
-                if (c != null) {
+
+                if (c != null) { // Si la cuenta existe, se imprime un resumen de su estado y contenido
                     System.out.println("\n==================================================");
                     System.out.println("AUDITORÍA DE CUENTA AVL: " + c.getJugador().getIdCuenta());
                     System.out.println("==================================================");
@@ -124,7 +156,9 @@ public class Main {
                     System.out.println("Ubicación Actual: Piso " + c.getJugador().getPisoActual());
 
                     System.out.println("\n-> Mochila del Jugador (Recorrido Inorden ABB):");
-                    Cola<Item> items = c.getInventario().obtenerInorden();
+                    // Obtenemos los ítems de la mochila del jugador en orden inorden desde el ABB
+                    Cola<Item> items = controlador.obtenerMochilaJugador(id);
+
                     if (items.estaVacia()) {
                         System.out.println("   [La mochila está vacía]");
                     } else {
@@ -135,18 +169,15 @@ public class Main {
                     }
 
                     System.out.println("\n-> Habilidades Desbloqueadas Automáticamente [CONJUNTO]:");
-                    if (c.getJugador().getHabilidadesAprendidas().estaVacio()) {
+                    // Se verifica si el conjunto de habilidades aprendidas está vacío; si no, se listan las habilidades desbloqueadas
+                    Cola<String> habilidades = controlador.obtenerHabilidadesJugador(id);
+
+                    if (habilidades.estaVacia()) {
                         System.out.println("   [No cumple requisitos para ninguna habilidad de su clase]");
                     } else {
-                        String[] habilidadesCatalogo = {
-                                "Estocada Certera", "Torbellino de Espadas", "Golpe de Escudo", "Maestría en Espadas", "Reflejos de Acero", "Coraza de Titán",
-                                "Bola de Fuego", "Ventisca Helada", "Impacto Trueno",
-                                "Emboscada", "Hoja Envenenada", "Ejecución", "Paso Sombrío", "Manto de Invisibilidad"
-                        };
-                        for (String hab : habilidadesCatalogo) {
-                            if (c.getJugador().getHabilidadesAprendidas().contiene(hab)) {
-                                System.out.println("   ✓ " + hab);
-                            }
+                        while (!habilidades.estaVacia()) {
+                            String hab = habilidades.desencolar();
+                            System.out.println("   ✓ " + hab);
                         }
                     }
 
@@ -297,7 +328,7 @@ public class Main {
             }
             case 4 -> {
                 System.out.print("Ingrese el ID de la cuenta para revertir su última transacción (ej: ACC-77): ");
-                String idBuscado = scanner.nextLine().trim();
+                String idBuscado = scanner.nextLine().trim().toUpperCase();
                 System.out.println("\n--- EJECUCIÓN: HITO 4 (SISTEMA DE COMERCIO SEGURO) ---");
                 if (controlador.ejecutarHito4(idBuscado)) {
                     System.out.println("[SISTEMA] Flujo completado de forma segura y exitosa.");

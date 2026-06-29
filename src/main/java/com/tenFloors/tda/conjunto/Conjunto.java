@@ -1,5 +1,7 @@
 package main.java.com.tenFloors.tda.conjunto;
 
+import main.java.com.tenFloors.tda.cola.Cola;
+
 /**
  * Implementación nativa de un Conjunto (Set) basado en una Tabla Hash.
  * de los jugadores actualmente online en el servidor, evitando inicios de sesión duplicados.
@@ -167,5 +169,32 @@ public class Conjunto<T> {
                 actual = actual.siguiente;
             }
         }
+    }
+
+    /**
+     * Exporta todos los elementos del conjunto a una estructura lineal (Cola)
+     * para permitir su recorrido y lectura externa.
+     *
+     * @return Una Cola con todos los elementos actuales del conjunto.
+     */
+    public Cola<T> obtenerElementos() {
+        Cola<T> colaResultado = new Cola<>();
+
+        // Recorremos cada uno de los baldes (buckets) de la tabla hash
+        for (int i = 0; i < this.tabla.length; i++) {
+            Nodo<T> actual = this.tabla[i];
+
+            // Si el balde tiene colisiones o elementos, recorremos su lista enlazada
+            while (actual != null) {
+                colaResultado.encolar(actual.elemento);
+                // NOTA: Si en la firma exacta de tu TDA Cola usaron 'enqueue',
+                // reemplaza 'encolar' por 'enqueue'. Dado que en Main.java usan 'desencolar',
+                // lo lógico y simétrico es que se llame 'encolar'.
+
+                actual = actual.siguiente;
+            }
+        }
+
+        return colaResultado;
     }
 }
