@@ -1,10 +1,9 @@
 package main.java.com.tenFloors.model;
 
 /**
- * Representa la entidad base de cualquier objeto almacenable.
- * Ya no depende de ninguna interfaz externa de identificación.
+ * Implementación concreta de la entidad Item para su uso en el simulador de juego.
  */
-public abstract class Item {
+public class Item {
 
     private final String idItem;
     private final String nombre;
@@ -16,7 +15,6 @@ public abstract class Item {
         this.rareza = rareza;
     }
 
-    // Mantenemos el metodo para obtener el ID, pero ahora retorna String
     public String getId() {
         return this.idItem;
     }
@@ -29,13 +27,10 @@ public abstract class Item {
         return rareza;
     }
 
-    /**
-     * METODO ABSTRACTO: Toda clase hija (Espada, Pocion, etc.)
-     * está OBLIGADA a definir qué pasa cuando el jugador usa el ítem.
-     */
-    public abstract void usar();
+    public void usar() {
+        System.out.println("[SISTEMA] Has equipado/utilizado el ítem: " + getNombre());
+    }
 
-    @Override
     public String toString() {
         return "[" + idItem + "] " + nombre + " (" + rareza + ")";
     }

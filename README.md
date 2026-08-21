@@ -30,7 +30,7 @@ El sistema se compone de los siguientes Trabajos de Datos Abstractos (TDAs) dist
 ### Control de Flujos y Accesos (A cargo de Lautaro)
 * **Pila (Historial de Menús)**: Navegación de la interfaz mediante comportamiento LIFO (`push`, `pop`, `peek`).
 * **Cola Estándar (Espera de Mazmorras)**: Gestión FIFO para emparejamiento de *parties*.
-* **Cola con Prioridad (Registro de Misiones / Tickets VIP)**: Implementada mediante un Max/Min Heap para extraer eventos de alta prioridad o jefes de mundo.
+* **Cola con Prioridad (Registro de Misiones / Tickets VIP)**
 * **Conjunto o Diccionario (Jugadores Online)**: Registro rápido en tiempo constante para el estado online de las cuentas, evitando accesos duplicados.
 
 ---
@@ -60,8 +60,37 @@ ten-floors-mmorpg/
 │   │   └── java/
 │   │       └── com/
 │   │           └── tenfloors/
-│   │               ├── Main.java    # Menú interactivo principal (Scanner / Switch-case)
-│   │               ├── model/       # Clases de negocio
+│   │               ├── Main.java                 # Punto de entrada exclusivo (Scanner / Switch-case)
+│   │               │
+│   │               ├── model/                    # ENTIDADES PURAS (Solo datos y lógica interna del objeto)
+│   │               │     ├── ClaseHabilidad.java
+│   │               │     ├── Cuenta.java
+│   │               │     ├── Gremio.java
+│   │               │     ├── Item.java
+│   │               │     ├── Jugador.java
+│   │               │     ├── Mision.java
+│   │               │     ├── Ticket.java
+│   │               │     └── Transaccion.java
+│   │               │
+│   │               ├── controlador/              # ORQUESTADOR CENTRAL
+│   │               │     └── ControladorJuego.java
+│   │               │
+│   │               ├── gestor/                   # LÓGICA DE NEGOCIO Y MANIPULACIÓN DE TDAs DEL JUEGO
+│   │               │     ├── GestionMazmorras.java
+│   │               │     ├── GestionOnline.java
+│   │               │     ├── GestorCuentas.java
+│   │               │     ├── GestorInventario.java
+│   │               │     ├── GestorMapa.java
+│   │               │     ├── GestorMisiones.java
+│   │               │     ├── GestorTransacciones.java
+│   │               │     └── GestorHabilidades.java
+│   │               │
+│   │               ├── consulta/                 # HITOS GRUPALES (Las 4 Consultas Complejas requeridas)
+│   │               │     ├── SistemaAuditoriaGremios.java
+│   │               │     ├── SistemaComercioSeguro.java
+│   │               │     ├── SistemaSoporteVIP.java
+│   │               │     └── SistemaViajeYParty.java
+│   │               │
 │   │               └── tda/         # Estructuras de datos (TDAs individuales)
 │   │                   ├── abb/
 │   │                   ├── arbol/

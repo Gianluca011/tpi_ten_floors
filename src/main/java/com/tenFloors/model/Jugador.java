@@ -1,5 +1,7 @@
 package main.java.com.tenFloors.model;
 
+import main.java.com.tenFloors.tda.conjunto.Conjunto;
+
 import java.util.Objects;
 
 /**
@@ -10,8 +12,10 @@ public class Jugador {
     private final String nombre;
     private int nivel;
     private int pisoActual;
+    private String clase;
+    private final Conjunto<String> habilidadesAprendidas;
 
-    public Jugador(String idCuenta, String nombre) {
+    public Jugador(String idCuenta, String nombre, String clase) {
         if (idCuenta == null || nombre == null) {
             throw new IllegalArgumentException("El ID de cuenta y el nombre no pueden ser nulos.");
         }
@@ -19,6 +23,8 @@ public class Jugador {
         this.nombre = nombre;
         this.nivel = 1;
         this.pisoActual = 1; // Arranca en el piso 1 de la torre
+        this.clase = clase;
+        this.habilidadesAprendidas = new Conjunto<>();
     }
 
     public String getIdCuenta() { return idCuenta; }
@@ -27,6 +33,12 @@ public class Jugador {
     public void setNivel(int nivel) { this.nivel = nivel; }
     public int getPisoActual() { return pisoActual; }
     public void setPisoActual(int pisoActual) { this.pisoActual = pisoActual; }
+    public String getClase() { return clase; }
+    public void setClase(String clase) { this.clase = clase; }
+
+    public Conjunto<String> getHabilidadesAprendidas() {
+        return this.habilidadesAprendidas;
+    }
 
     @Override
     public boolean equals(Object o) {

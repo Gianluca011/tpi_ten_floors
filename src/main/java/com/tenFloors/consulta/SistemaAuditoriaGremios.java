@@ -1,7 +1,10 @@
-package main.java.com.tenFloors.model;
+package main.java.com.tenFloors.consulta;
 
+import main.java.com.tenFloors.model.Cuenta;
+import main.java.com.tenFloors.model.Gremio;
+import main.java.com.tenFloors.model.Jugador;
 import main.java.com.tenFloors.tda.arbol.ArbolGenerico;
-import main.java.com.tenFloors.tda.avl.ArbolAVLCuentas;
+import main.java.com.tenFloors.tda.avl.ArbolAVL;
 import main.java.com.tenFloors.tda.conjunto.Conjunto;
 
 /**
@@ -16,7 +19,7 @@ public class SistemaAuditoriaGremios {
      * @param indiceCuentas Índice global auto-balanceado AVL de cuentas del servidor.
      * @return Un Conjunto nativo con los perfiles de Jugador consolidados de forma única.
      */
-    public Conjunto<Jugador> auditarLideresGremio(Gremio gremio, ArbolAVLCuentas<Cuenta> indiceCuentas) {
+    public Conjunto<Jugador> auditarLideresGremio(Gremio gremio, ArbolAVL<Cuenta> indiceCuentas) {
         Conjunto<Jugador> lideresConsolidados = new Conjunto<>();
 
         if (gremio == null) {
@@ -43,7 +46,7 @@ public class SistemaAuditoriaGremios {
      * Recorre de forma recursiva el árbol utilizando la lógica de "Primer Hijo / Siguiente Hermano".
      */
     private void procesarNodoRecursivo(ArbolGenerico.NodoArbol<String> nodoActual,
-                                       ArbolAVLCuentas<Cuenta> indiceCuentas,
+                                       ArbolAVL<Cuenta> indiceCuentas,
                                        Conjunto<Jugador> conjuntoDestino) {
         if (nodoActual == null) {
             return;

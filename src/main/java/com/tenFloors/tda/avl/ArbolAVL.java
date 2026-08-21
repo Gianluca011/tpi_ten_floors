@@ -1,9 +1,11 @@
 package main.java.com.tenFloors.tda.avl;
 
-public class ArbolAVLCuentas<T> {
+import main.java.com.tenFloors.tda.cola.Cola;
+
+public class ArbolAVL<T> {
     private NodoAVL<T> raiz;
 
-    public ArbolAVLCuentas() { this.raiz = null; }
+    public ArbolAVL() { this.raiz = null; }
 
     public int mostrarAltura() { return altura(raiz); }
 
@@ -145,5 +147,19 @@ public class ArbolAVLCuentas<T> {
         }
 
         return n;
+    }
+
+    public Cola<T> obtenerInorden() {
+        Cola<T> colaResultado = new Cola<>();
+        inordenRec(raiz, colaResultado);
+        return colaResultado;
+    }
+
+    private void inordenRec(NodoAVL<T> nodo, Cola<T> cola) {
+        if (nodo != null) {
+            inordenRec(nodo.getIzquierdo(), cola);
+            cola.encolar(nodo.getDato()); // Encolado secuencial síncrono
+            inordenRec(nodo.getDerecho(), cola);
+        }
     }
 }

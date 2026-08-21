@@ -1,7 +1,8 @@
-package main.java.com.tenFloors.model;
+package main.java.com.tenFloors.gestor;
 
+import main.java.com.tenFloors.model.Item;
 import main.java.com.tenFloors.tda.abb.ArbolABB;
-import java.util.List;
+import main.java.com.tenFloors.tda.cola.Cola;
 
 public class GestorInventario {
 
@@ -46,14 +47,15 @@ public class GestorInventario {
         System.out.println("\n--- INVENTARIO DEL JUGADOR ---");
 
         // El recorrido Inorden nos garantiza el orden alfabético de los IDs de los ítems
-        List<Item> itemsOrdenados = arbolMochila.obtenerInorden();
+        Cola<Item> itemsOrdenados = arbolMochila.obtenerInorden();
 
-        if (itemsOrdenados.isEmpty()) {
+        if (itemsOrdenados.estaVacia()) {
             System.out.println("La mochila está vacía.");
             return;
         }
 
-        for (Item item : itemsOrdenados) {
+        while (!itemsOrdenados.estaVacia()) {
+            Item item = itemsOrdenados.desencolar();
             System.out.println(" -> " + item.toString());
         }
     }

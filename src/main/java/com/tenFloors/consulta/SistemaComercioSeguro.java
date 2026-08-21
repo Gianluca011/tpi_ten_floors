@@ -1,6 +1,9 @@
-package main.java.com.tenFloors.model;
+package main.java.com.tenFloors.consulta;
 
-import main.java.com.tenFloors.tda.avl.ArbolAVLCuentas;
+import main.java.com.tenFloors.model.Cuenta;
+import main.java.com.tenFloors.model.Item;
+import main.java.com.tenFloors.model.Transaccion;
+import main.java.com.tenFloors.tda.avl.ArbolAVL;
 import main.java.com.tenFloors.tda.abb.ArbolABB;
 import main.java.com.tenFloors.tda.pila.Pila;
 
@@ -10,7 +13,7 @@ import main.java.com.tenFloors.tda.pila.Pila;
  */
 public class SistemaComercioSeguro {
 
-    private final ArbolAVLCuentas<Cuenta> indiceCuentas;
+    private final ArbolAVL<Cuenta> indiceCuentas;
     private final ArbolABB<Item> baseGlobalItems;
 
     /**
@@ -18,7 +21,7 @@ public class SistemaComercioSeguro {
      * @param indiceCuentas Instancia del Árbol AVL global de cuentas.
      * @param baseGlobalItems Instancia del Árbol ABB de ítems válidos en el servidor.
      */
-    public SistemaComercioSeguro(ArbolAVLCuentas<Cuenta> indiceCuentas, ArbolABB<Item> baseGlobalItems) {
+    public SistemaComercioSeguro(ArbolAVL<Cuenta> indiceCuentas, ArbolABB<Item> baseGlobalItems) {
         this.indiceCuentas = indiceCuentas;
         this.baseGlobalItems = baseGlobalItems;
     }

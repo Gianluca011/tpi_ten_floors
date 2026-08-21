@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="EjecutarJuego" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="main.java.com.tenFloors.Main" />
+    <module name="tpi_ten_floors" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
